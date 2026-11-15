@@ -1,0 +1,2792 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Red Dust Habitat – Mars Mission Sim</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #3b2c2a;
+      --paper: #fff3e2;
+      --card: #fffaf2;
+      --apricot: #ffd2a6;
+      --coral: #f28b6e;
+      --sage: #c3e6cc;
+      --sky: #bfe0f2;
+      --butter: #ffe8a3;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: "Nunito", system-ui, sans-serif;
+      font-weight: 600;
+      color: var(--ink);
+      min-height: 100vh;
+      background: #000
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-repeat: repeat
+    }
+
+    body::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%23f2b63c'%3E%3Cpath d='M30 20q2 10 12 12q-10 2-12 12q-2-10-12-12q10-2 12-12z'/%3E%3Cpath d='M190 150q2 10 12 12q-10 2-12 12q-2-10-12-12q10-2 12-12z'/%3E%3C/g%3E%3Cg fill='%23f28b6e'%3E%3Ccircle cx='120' cy='60' r='3'/%3E%3Ccircle cx='230' cy='40' r='2.5'/%3E%3Ccircle cx='70' cy='170' r='3'/%3E%3Ccircle cx='150' cy='235' r='2.5'/%3E%3C/g%3E%3Cg fill='%2386b9f5'%3E%3Cpath d='M200 80q1.5 7 8.5 8.5q-7 1.5-8.5 8.5q-1.5-7-8.5-8.5q7-1.5 8.5-8.5z'/%3E%3Cpath d='M60 110q1.5 7 8.5 8.5q-7 1.5-8.5 8.5q-1.5-7-8.5-8.5q7-1.5 8.5-8.5z'/%3E%3Ccircle cx='20' cy='220' r='3'/%3E%3C/g%3E%3C/svg%3E")
+    }
+
+    body::after {
+      background-size: 340px 340px;
+      background-position: 90px 140px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%23fff' stroke='%23e0a96d' stroke-width='1'%3E%3Cpath d='M80 30q2 9 11 11q-9 2-11 11q-2-9-11-11q9-2 11-11z'/%3E%3Cpath d='M210 200q2 9 11 11q-9 2-11 11q-2-9-11-11q9-2 11-11z'/%3E%3Ccircle cx='160' cy='120' r='3'/%3E%3Ccircle cx='30' cy='150' r='3'/%3E%3C/g%3E%3C/svg%3E");
+      animation: twinkle 4s ease-in-out infinite alternate
+    }
+
+    @keyframes twinkle {
+      from {
+        opacity: .25
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    h1,
+    h2,
+    h3,
+    .btn,
+    .hd {
+      font-family: "Baloo 2", "Trebuchet MS", sans-serif
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0
+    }
+
+    [hidden] {
+      display: none !important
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 16px
+    }
+
+    .card {
+      background: var(--card);
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 5px 5px 0 var(--coral);
+      padding: 14px
+    }
+
+    .hero {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--apricot);
+      margin-bottom: 16px;
+      overflow: hidden
+    }
+
+    .hero svg {
+      width: 200px;
+      max-width: 100%;
+      flex: none
+    }
+
+    .hero h1 {
+      font-size: 2.3rem;
+      line-height: 1;
+      font-weight: 800
+    }
+
+    .hero p {
+      margin-top: 6px;
+      max-width: 440px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px
+    }
+
+    .card h2 {
+      font-size: 1.35rem;
+      margin-bottom: 8px
+    }
+
+    .opt {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      background: #fff;
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      padding: 9px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: transform .1s
+    }
+
+    .opt b {
+      font-family: "Baloo 2", sans-serif;
+      font-size: 1.05rem
+    }
+
+    .opt small {
+      display: block;
+      font-weight: 600;
+      opacity: .8
+    }
+
+    .opt:hover {
+      transform: translate(-1px, -1px)
+    }
+
+    .opt.on {
+      background: var(--butter);
+      box-shadow: 3px 3px 0 var(--ink)
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .row .opt {
+      width: auto;
+      margin: 0;
+      flex: 1 1 90px;
+      text-align: center
+    }
+
+    .av {
+      font-size: 1.8rem;
+      padding: 4px 10px
+    }
+
+    .sw {
+      width: 42px;
+      height: 42px;
+      flex: none;
+      border-radius: 50%;
+      border: 3px solid var(--ink);
+      cursor: pointer
+    }
+
+    .sw.on {
+      box-shadow: 0 0 0 3px var(--card), 0 0 0 6px var(--ink)
+    }
+
+    input[type=text] {
+      width: 100%;
+      font: inherit;
+      font-weight: 800;
+      padding: 9px 12px;
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      margin-bottom: 10px
+    }
+
+    label.l {
+      display: block;
+      font-weight: 800;
+      margin: 6px 0 4px
+    }
+
+    .btn {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ink);
+      background: var(--coral);
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      padding: 10px 22px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--ink);
+      transition: transform .1s, box-shadow .1s
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--ink)
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .btn.alt {
+      background: var(--sage)
+    }
+
+    .launch {
+      display: block;
+      margin: 20px auto 0;
+      font-size: 1.6rem;
+      padding: 12px 34px
+    }
+
+    .how {
+      margin-top: 16px;
+      background: var(--sky)
+    }
+
+    .how ol {
+      margin: 6px 0 0;
+      padding-left: 22px
+    }
+
+    /* game */
+    .top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--sky);
+      margin-bottom: 14px
+    }
+
+    .top .grow {
+      flex: 1 1 240px
+    }
+
+    .sol {
+      font-size: 1.5rem;
+      font-weight: 800
+    }
+
+    .prog {
+      height: 14px;
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+      margin: 4px 0
+    }
+
+    .prog i {
+      display: block;
+      height: 100%;
+      background: var(--coral);
+      transition: width .4s
+    }
+
+    .pips span {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--ink);
+      border-radius: 50%;
+      margin-right: 4px;
+      background: var(--butter)
+    }
+
+    .pips span.used {
+      background: #fff
+    }
+
+    .alert {
+      background: #ffd9d0;
+      border: 3px dashed var(--ink);
+      border-radius: 14px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      font-weight: 800
+    }
+
+    #hud {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px
+    }
+
+    .tile {
+      position: relative;
+      background: #fff;
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      padding: 8px 10px
+    }
+
+    .tile:nth-child(odd) {
+      transform: rotate(-.6deg)
+    }
+
+    .tile:nth-child(even) {
+      transform: rotate(.5deg)
+    }
+
+    .tile .hd {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem
+    }
+
+    .bar {
+      height: 12px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff0dc;
+      overflow: hidden;
+      margin-top: 4px
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      transition: width .4s
+    }
+
+    .tile.low {
+      background: #ffd9d0;
+      animation: wob .9s infinite
+    }
+
+    .badge {
+      position: absolute;
+      top: -10px;
+      right: -6px;
+      background: var(--coral);
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      padding: 0 7px;
+      font-size: .75rem;
+      font-weight: 800
+    }
+
+    @keyframes wob {
+      50% {
+        transform: rotate(1.2deg) scale(1.03)
+      }
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px
+    }
+
+    @media(max-width:800px) {
+      .main {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .main .card+.card {
+      margin-top: 14px
+    }
+
+    .act {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      background: #fff;
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      cursor: pointer
+    }
+
+    .act:hover:not(:disabled) {
+      background: var(--butter)
+    }
+
+    .act:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .act .ai {
+      font-size: 1.7rem
+    }
+
+    .act small {
+      display: block;
+      font-weight: 600
+    }
+
+    .fx {
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 800;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      padding: 0 6px;
+      margin: 3px 4px 0 0
+    }
+
+    .fx.up {
+      background: var(--sage)
+    }
+
+    .fx.dn {
+      background: #ffd0c4
+    }
+
+    .crew {
+      display: flex;
+      gap: 8px;
+      justify-content: space-around;
+      text-align: center;
+      font-size: .85rem
+    }
+
+    .crew div span {
+      display: block;
+      font-size: 2rem
+    }
+
+    #log {
+      margin: 0;
+      padding-left: 18px;
+      font-size: .92rem
+    }
+
+    #log li {
+      margin-bottom: 4px
+    }
+
+    #sun {
+      font-size: .9rem
+    }
+
+    .veil {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .8);
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      z-index: 20;
+      overflow: auto
+    }
+
+    .dil {
+      max-width: 560px;
+      width: 100%;
+      background: #fff
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--butter);
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      padding: 0 8px;
+      font-weight: 800;
+      font-size: .85rem;
+      margin-bottom: 6px
+    }
+
+    .hint {
+      margin: 8px 0;
+      font-size: .92rem;
+      opacity: .85
+    }
+
+    .fact {
+      background: var(--sky);
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin: 10px 0
+    }
+
+    .endc {
+      max-width: 620px;
+      margin: 30px auto;
+      text-align: center;
+      background: var(--sage)
+    }
+
+    .endc h1 {
+      font-size: 2.2rem
+    }
+
+    .stars {
+      font-size: 2.4rem;
+      letter-spacing: 4px;
+      margin: 6px 0
+    }
+
+    .endc ul {
+      text-align: left
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important
+      }
+    }
+
+    /* ── MOA Loading Overlay ───────────────────────────────────── */
+    #moa-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(ellipse at 50% 60%, #1a0a2e 0%, #0a0015 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding: 20px;
+      transition: opacity .5s ease;
+    }
+
+    #moa-loader.fade-out {
+      opacity: 0;
+      pointer-events: none
+    }
+
+    /* Orbital spinner */
+    .moa-orbit-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+
+    /* Glowing track ring */
+    .moa-orbit-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(242, 182, 60, .25);
+      box-shadow: 0 0 18px 2px rgba(242, 182, 60, .18), inset 0 0 14px 2px rgba(242, 182, 60, .10);
+    }
+
+    /* Mars planet in center */
+    .moa-mars {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.4rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 10px rgba(194, 68, 14, .8));
+    }
+
+    /* Orbiting astronaut */
+    .moa-astro {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 34px;
+      height: 34px;
+      margin-top: -17px;
+      margin-left: -17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      line-height: 1;
+      animation: moa-orbit 2.2s linear infinite;
+      transform-origin: 50% 50%;
+      filter: drop-shadow(0 0 6px rgba(255, 232, 163, .9));
+    }
+
+    @keyframes moa-orbit {
+      from {
+        transform: rotate(0deg) translateX(56px) rotate(0deg)
+      }
+
+      to {
+        transform: rotate(360deg) translateX(56px) rotate(-360deg)
+      }
+    }
+
+    /* Loading text */
+    .moa-load-headline {
+      font-family: "Baloo 2", "Trebuchet MS", sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #f2b63c;
+      letter-spacing: .12em;
+      text-align: center;
+      text-transform: uppercase;
+      animation: moa-pulse 1.8s ease-in-out infinite;
+    }
+
+    .moa-load-sub {
+      font-size: .88rem;
+      font-weight: 600;
+      color: #ffd2a6;
+      text-align: center;
+      opacity: .85;
+      margin-top: -18px;
+      max-width: 340px;
+      line-height: 1.5;
+    }
+
+    @keyframes moa-pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .45
+      }
+    }
+
+    /* ── MOA Guide page ────────────────────────────────────────── */
+    #moa-guide .guide-section {
+      margin-bottom: 18px
+    }
+
+    #moa-guide .guide-section h3 {
+      font-family: "Baloo 2", sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #3b2c2a;
+    }
+
+    .guide-meter-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .guide-meter-card {
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .guide-meter-card .gm-icon {
+      font-size: 2rem;
+      line-height: 1;
+      flex: none
+    }
+
+    .guide-meter-card b {
+      display: block;
+      font-family: "Baloo 2", sans-serif;
+      font-size: 1rem
+    }
+
+    .guide-meter-card small {
+      font-size: .85rem;
+      font-weight: 600;
+      opacity: .8;
+      line-height: 1.4
+    }
+
+    .guide-rule-box {
+      border: 3px dashed var(--coral);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 8px 0;
+      background: var(--paper);
+    }
+
+    .guide-rule-box.warn {
+      border-color: #c8600a;
+      background: #fff9e0
+    }
+
+    .guide-rule-box.fail {
+      border-color: #c8600a;
+      background: #ffd9d0
+    }
+
+    .guide-rule-box.win {
+      border-color: #1a7a40;
+      background: var(--sage)
+    }
+
+    /* ── MOA Pre-Day Cutscenes (Granny-style) ─────────────── */
+    .moa-cutscene-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9990;
+      background: radial-gradient(circle at 50% 45%, #2a0808 0%, #150202 55%, #050000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.96), inset 0 0 80px rgba(180, 20, 20, 0.35);
+      animation: moa-cutscene-fade 0.8s ease-out forwards;
+    }
+    @keyframes moa-cutscene-fade {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .moa-cutscene-sol {
+      font-family: "Baloo 2", "Trebuchet MS", sans-serif;
+      font-size: clamp(3.4rem, 10vw, 6rem);
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      color: #ff4a36;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+      line-height: 1;
+      text-shadow: 0 0 25px rgba(255, 74, 54, 0.85), 0 0 60px rgba(220, 30, 20, 0.6);
+      animation: moa-sol-pulse 2.6s ease-in-out infinite alternate;
+    }
+    @keyframes moa-sol-pulse {
+      from { text-shadow: 0 0 20px rgba(255, 74, 54, 0.75), 0 0 45px rgba(200, 25, 20, 0.45); }
+      to   { text-shadow: 0 0 35px rgba(255, 110, 80, 0.98), 0 0 75px rgba(255, 40, 20, 0.7); }
+    }
+    .moa-cutscene-sub {
+      font-family: "Nunito", system-ui, sans-serif;
+      font-size: clamp(1.15rem, 3vw, 1.6rem);
+      font-style: italic;
+      font-weight: 700;
+      color: #ffd8d0;
+      max-width: 620px;
+      line-height: 1.55;
+      margin: 0 0 40px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95);
+      opacity: 0.94;
+    }
+    .moa-cutscene-btn {
+      font-family: "Baloo 2", sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      padding: 12px 36px;
+      background: #f28b6e;
+      color: #2b120c;
+      border: 3px solid #3b2c2a;
+      border-radius: 16px;
+      box-shadow: 4px 4px 0 #000;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+    }
+    .moa-cutscene-btn:hover {
+      background: #ffa88f;
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    /* ── MOA Modals (Mission Control & Quit) ──────────────── */
+    .moa-modal-veil {
+      position: fixed;
+      inset: 0;
+      z-index: 9995;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(4px);
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .moa-modal-box {
+      max-width: 600px;
+      width: 100%;
+      background: var(--card);
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 6px 6px 0 var(--coral);
+      padding: 18px;
+      position: relative;
+    }
+    .moa-mc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin: 10px 0 14px;
+    }
+
+    /* ── MOA Action/Choice Overlay (1.5s animation) ─────── */
+    .moa-choice-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9992;
+      background: rgba(10, 3, 18, 0.82);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.3s ease;
+    }
+    .moa-choice-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .moa-choice-card {
+      position: relative;
+      background: linear-gradient(135deg, #240b36 0%, #120422 100%);
+      border: 3px solid #f2b63c;
+      border-radius: 24px;
+      box-shadow: 0 0 50px rgba(242, 182, 60, 0.4), inset 0 0 25px rgba(242, 182, 60, 0.15);
+      padding: 30px 24px;
+      text-align: center;
+      max-width: 440px;
+      width: 100%;
+      animation: moa-choice-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes moa-choice-pop {
+      from { transform: scale(0.7); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .moa-choice-pulse-ring {
+      position: absolute;
+      top: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 2px solid rgba(242, 182, 60, 0.7);
+      animation: moa-choice-pulse 1.4s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes moa-choice-pulse {
+      0% { transform: translateX(-50%) scale(0.8); opacity: 0.9; }
+      100% { transform: translateX(-50%) scale(1.6); opacity: 0; }
+    }
+    .moa-choice-icon {
+      font-size: 3.6rem;
+      line-height: 1;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 16px rgba(242, 182, 60, 0.8));
+      animation: moa-icon-bounce 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes moa-icon-bounce {
+      from { transform: translateY(0) scale(1); }
+      to   { transform: translateY(-6px) scale(1.08); }
+    }
+    .moa-choice-title {
+      font-family: "Baloo 2", sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #ffd2a6;
+      margin-bottom: 4px;
+    }
+    .moa-choice-subtitle {
+      font-size: 0.88rem;
+      color: #bfe0f2;
+      opacity: 0.85;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .moa-choice-deltas {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .moa-delta-pill {
+      font-family: "Baloo 2", sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    .moa-delta-pill.up {
+      color: #48bb78;
+      background: rgba(72, 187, 120, 0.16);
+      border: 2px solid #38a169;
+      text-shadow: 0 0 8px rgba(72, 187, 120, 0.5);
+    }
+    .moa-delta-pill.dn {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.16);
+      border: 2px solid #e53e3e;
+      text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+    }
+
+    /* ── MOA Victory Rocket Animation ──────────────────────── */
+    .moa-victory-wrap {
+      position: relative;
+      background: radial-gradient(ellipse at 50% 20%, #15103a 0%, #070314 60%, #020005 100%);
+      border: 3px solid #f2b63c;
+      border-radius: 24px;
+      box-shadow: 0 0 60px rgba(242, 182, 60, 0.45);
+      padding: 30px 20px 36px;
+      overflow: hidden;
+      text-align: center;
+      color: #fffaf2;
+    }
+    .moa-space-scene {
+      position: relative;
+      height: 220px;
+      width: 100%;
+      margin: 10px auto 20px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 50% 15%, #1e1b4b 0%, #0b081e 80%);
+      overflow: hidden;
+      border: 2px solid rgba(242, 182, 60, 0.4);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+    }
+    .moa-earth {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3.2rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 18px #38bdf8);
+      animation: moa-earth-glow 3s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+    @keyframes moa-earth-glow {
+      from { filter: drop-shadow(0 0 14px #38bdf8); }
+      to   { filter: drop-shadow(0 0 28px #60a5fa); }
+    }
+    .moa-mars-surface {
+      position: absolute;
+      bottom: -45px;
+      left: -10%;
+      width: 120%;
+      height: 90px;
+      background: radial-gradient(ellipse at 50% 0%, #c1440e 0%, #7c2d12 70%, #451a03 100%);
+      border-radius: 50%;
+      border-top: 3px solid #f28b6e;
+      box-shadow: 0 0 25px rgba(193, 68, 14, 0.6);
+      z-index: 1;
+    }
+    .moa-mars-label {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #ffd2a6;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.9;
+      z-index: 2;
+    }
+    .moa-rocket {
+      position: absolute;
+      left: 50%;
+      font-size: 2.8rem;
+      line-height: 1;
+      margin-left: -20px;
+      animation: moa-rocket-flight 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      filter: drop-shadow(0 4px 14px rgba(242, 182, 60, 0.85));
+      z-index: 3;
+    }
+    @keyframes moa-rocket-flight {
+      0% {
+        bottom: 30px;
+        transform: rotate(0deg) scale(0.9);
+      }
+      15% {
+        bottom: 35px;
+        transform: rotate(-4deg) scale(0.95);
+      }
+      30% {
+        bottom: 55px;
+        transform: rotate(3deg) scale(1);
+      }
+      75% {
+        bottom: 135px;
+        transform: rotate(0deg) scale(1.1);
+      }
+      100% {
+        bottom: 155px;
+        transform: rotate(0deg) scale(0.95);
+        opacity: 0.9;
+      }
+    }
+    .moa-stars-bg {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 60px 120px, #ffd75e, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 150px 50px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 220px 170px, #bfe0f2, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 310px 80px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 370px 140px, #ffd75e, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 400px 200px;
+      opacity: 0.85;
+    }
+    .moa-victory-headline {
+      font-family: "Baloo 2", sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      color: #ffd75e;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 12px 0 8px;
+      line-height: 1.15;
+      text-shadow: 0 0 25px rgba(255, 215, 94, 0.7);
+    }
+    .moa-victory-badge {
+      display: inline-block;
+      font-family: "Baloo 2", sans-serif;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      background: linear-gradient(90deg, #c8600a, #f2b63c, #c8600a);
+      color: #1a0805;
+      padding: 6px 20px;
+      border-radius: 999px;
+      border: 2px solid #fff;
+      box-shadow: 0 0 20px rgba(242, 182, 60, 0.6);
+      margin-bottom: 18px;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+     MOA LOADING OVERLAY — shown on page-open AND mission launch
+     Controlled entirely by JS; hidden attr set/removed via moaLoader()
+══════════════════════════════════════════════════════════ -->
+  <div id="moa-loader" role="status" aria-live="polite" aria-label="Loading Mars Outpost Alpha">
+    <div class="moa-orbit-wrap">
+      <div class="moa-orbit-ring"></div>
+      <div class="moa-mars">🔴</div>
+      <div class="moa-astro">🧑‍🚀</div>
+    </div>
+    <div id="moa-load-headline" class="moa-load-headline">
+      ESTABLISHING UPLINK WITH MARS OUTPOST ALPHA…
+    </div>
+    <div id="moa-load-sub" class="moa-load-sub"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+     MOA MISSION GUIDE PAGE
+══════════════════════════════════════════════════════════ -->
+  <main id="moa-guide" class="wrap" hidden>
+
+    <!-- Back button -->
+    <div style="margin-bottom:14px">
+      <button id="moa-guide-back" class="btn alt" style="font-size:1rem;padding:8px 18px">
+        ← Back to Mission Control
+      </button>
+    </div>
+
+    <!-- Hero header -->
+    <div class="card hero"
+      style="background:linear-gradient(135deg,#1a0a2e 0%,#2d1b4e 40%,#8b2500 100%);color:#fff3e2;border-color:#f28b6e;margin-bottom:16px">
+      <div style="font-size:4rem;padding:0 8px">📖</div>
+      <div>
+        <h1 style="color:#f2b63c;font-size:1.9rem;line-height:1.1">Mission Guide</h1>
+        <p style="color:#ffd2a6;margin-top:6px;font-size:1rem">Everything you need to keep Mars Outpost Alpha alive for
+          10 days!</p>
+      </div>
+    </div>
+
+    <div class="grid" style="gap:16px">
+
+      <!-- HOW TO PLAY -->
+      <section class="card guide-section">
+        <h3>🎮 How to Play</h3>
+        <p style="line-height:1.7;font-size:.97rem">
+          You are the commander of <b>Mars Outpost Alpha</b>. Each day (from <b>Day 1 to Day 10</b>) something
+          happens on Mars or in space — a dust storm, a solar flare, or a supply decision. You pick
+          <b>Option A</b> or <b>Option B</b>. Each choice helps one thing but hurts another, so think
+          carefully! After you pick, click <b>Next Day</b> to move on. Survive all <b>10 Days</b>
+          and your crew makes it home safely. 🚀
+        </p>
+        <div
+          style="margin-top:12px;background:var(--butter);border:2px solid var(--ink);border-radius:12px;padding:10px 14px">
+          <b style="font-family:'Baloo 2',sans-serif">The Golden Rule:</b>
+          <span style="font-size:.93rem"> Every choice is a <em>trade-off</em>. Gaining power might cost oxygen.
+            Saving shields might hurt crew health. Plan ahead!</span>
+        </div>
+      </section>
+
+      <!-- NASA DATA NOTE -->
+      <section class="card guide-section" style="background:var(--sky)">
+        <h3>🛰️ Real NASA Space Weather</h3>
+        <p style="line-height:1.7;font-size:.93rem">
+          Every event in this game is based on <b>real space-weather records</b> from
+          <b>November 7–14, 2026</b>, tracked by NASA's <b>DONKI</b> database
+          (Space Weather Database Of Notifications, Knowledge, Information) and the
+          <b>WSA-ENLIL</b> solar wind model. Those tools track solar flares, coronal mass ejections
+          (CMEs), and geomagnetic storms in real time — the same data real mission controllers watch!
+        </p>
+      </section>
+
+      <!-- THE 4 SYSTEMS -->
+      <section class="card guide-section" style="grid-column:1/-1">
+        <h3>⚙️ The 4 Outpost Systems</h3>
+        <p style="font-size:.92rem;margin-bottom:10px;opacity:.85">Keep all four above 0% or the mission ends!</p>
+        <div class="guide-meter-row">
+
+          <div class="guide-meter-card" style="border-color:#c8600a;background:#fffae0">
+            <div class="gm-icon">⚡</div>
+            <div>
+              <b>Power</b>
+              <small>Electricity from solar panels runs <em>everything</em> —
+                heaters, life support, grow lights, the landing radar,
+                and the communications array. When power gets low,
+                other systems start failing too.</small>
+            </div>
+          </div>
+
+          <div class="guide-meter-card" style="border-color:#1a6e9c;background:#d4f1ff">
+            <div class="gm-icon">🫧</div>
+            <div>
+              <b>Oxygen</b>
+              <small>The habitat pumps clean air for the crew to breathe.
+                Activities like EVA spacewalks, running machines,
+                and sealing the bunker all use oxygen. Plants help
+                make more — but only if the grow lights are on!</small>
+            </div>
+          </div>
+
+          <div class="guide-meter-card" style="border-color:#2a3fa0;background:#dce8ff">
+            <div class="gm-icon">🛡️</div>
+            <div>
+              <b>Shields</b>
+              <small>Mars has no magnetic field, so radiation storms and
+                solar flares hit the outpost directly. Shields absorb
+                that energy. Rovers outside, science experiments,
+                and storms all drain shields fast.</small>
+            </div>
+          </div>
+
+          <div class="guide-meter-card" style="border-color:#1a7a40;background:#d6f5e3">
+            <div class="gm-icon">❤️</div>
+            <div>
+              <b>Crew Health</b>
+              <small>How well the astronauts are doing — hydration,
+                nutrition, exercise, and rest. Zero-gravity weakens
+                muscles, so skipping workouts or running low on water
+                and food will hurt the whole crew quickly.</small>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- WIN & LOSS RULES -->
+      <section class="card guide-section" style="grid-column:1/-1">
+        <h3>🏆 Win &amp; Loss Rules</h3>
+
+        <div class="guide-rule-box warn">
+          <b>⚠️ Critical Warning — Below 30%</b><br>
+          <span style="font-size:.93rem">If <em>any</em> meter drops below <b>30%</b>, a yellow alert
+            banner flashes on screen. That system is in danger! You still have time to fix it —
+            but act fast or it will reach zero.</span>
+        </div>
+
+        <div class="guide-rule-box fail">
+          <b>💥 Mission Failed — 0%</b><br>
+          <span style="font-size:.93rem">If <em>any</em> meter hits <b>0%</b>, the mission ends
+            immediately. Mission Control evacuates the crew. You can always try again with
+            a different strategy!</span>
+        </div>
+
+        <div class="guide-rule-box win">
+          <b>🌟 Mission Complete — Survive All 10 Days!</b><br>
+          <span style="font-size:.93rem">Make it through all 10 Days with every system above 0%
+            and you earn the <b>Junior Astronaut Certificate</b>! Your final star rating
+            (1–3 ⭐) depends on how healthy all four systems are at the end:</span>
+          <ul style="font-size:.9rem;margin:6px 0 0;padding-left:18px;line-height:1.8">
+            <li>⭐ — You survived! Average health above 0%</li>
+            <li>⭐⭐ — Great job! Average health ≥ 50%</li>
+            <li>⭐⭐⭐ — Outstanding Commander! Average health ≥ 75%</li>
+          </ul>
+        </div>
+      </section>
+
+    </div><!-- /grid -->
+
+    <div style="text-align:center;padding:14px 0 18px;font-size:.82rem;opacity:.65;margin-top:4px">
+      🛰️ Grounded in real NASA DONKI &amp; WSA-ENLIL Space Weather Data
+    </div>
+  </main>
+
+
+  <main id="lobby" class="wrap" hidden>
+    <div class="card hero">
+      <svg viewBox="0 0 200 120" aria-hidden="true">
+        <circle cx="36" cy="30" r="13" fill="#bfe0f2" stroke="#3b2c2a" stroke-width="3" />
+        <ellipse cx="36" cy="30" rx="24" ry="6" fill="none" stroke="#3b2c2a" stroke-width="3"
+          transform="rotate(-18 36 30)" />
+        <circle cx="150" cy="36" r="22" fill="#fff3c4" stroke="#3b2c2a" stroke-width="3" />
+        <path d="M0 96 Q50 70 100 92 T200 84 V120 H0Z" fill="#f4a98a" stroke="#3b2c2a" stroke-width="3" />
+        <path d="M0 110 Q60 92 120 106 T200 102 V120 H0Z" fill="#e98b6b" stroke="#3b2c2a" stroke-width="3" />
+        <path d="M52 92 a22 22 0 0 1 44 0Z" fill="#bfe0f2" stroke="#3b2c2a" stroke-width="3" />
+        <rect x="68" y="82" width="12" height="10" fill="#fff" stroke="#3b2c2a" stroke-width="2" />
+      </svg>
+      <div>
+        <h1>Red Dust Habitat</h1>
+        <p>You’re in charge of a tiny home on Mars. Keep four astronauts alive, happy, and curious. Every choice costs
+          something!</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>1. Pick a mission</h2>
+        <div id="missions"></div>
+        <h2 style="margin-top:12px">2. Difficulty</h2>
+        <div id="diffs" class="row"></div>
+        <p id="diffTxt" class="hint"></p>
+      </section>
+      <section class="card">
+        <h2>3. Your crew profile</h2>
+        <label class="l" for="name">Astronaut name</label>
+        <input id="name" type="text" maxlength="12" value="Nova" autocomplete="off">
+        <label class="l">Specialty</label>
+        <div id="roles"></div>
+        <label class="l">Face</label>
+        <div id="avs" class="row"></div>
+        <label class="l">Suit color</label>
+        <div id="suits" class="row"></div>
+      </section>
+    </div>
+
+    <div class="card how">
+      <h2>How to play</h2>
+      <ol>
+        <li>Each Sol (a Martian day) you get a few action points. Spend them on jobs.</li>
+        <li>Press <b>End Sol</b>. The crew uses up air, water and food.</li>
+        <li>Sometimes a dilemma pops up. You can only pick one answer!</li>
+        <li>Last until the final Sol with everyone safe.</li>
+      </ol>
+    </div>
+    <button id="launch" class="btn launch">🚀 Launch Mission · Start Sol 1</button>
+  </main>
+
+  <!-- GAME -->
+  <main id="game" class="wrap" hidden>
+    <div class="card top">
+      <div class="grow">
+        <div class="sol hd" id="solTxt"></div>
+        <div class="prog"><i id="solFill"></i></div>
+        <div id="sun"></div>
+      </div>
+      <div>
+        <div style="font-weight:800">Action points</div>
+        <div class="pips" id="pips"></div>
+      </div>
+      <button id="endSol" class="btn">🌙 End Sol</button>
+    </div>
+    <div id="warn" class="alert" role="alert" hidden></div>
+    <div id="hud" aria-live="polite"></div>
+    <div class="main">
+      <div>
+        <section class="card">
+          <h2>Today’s jobs</h2>
+          <div id="acts"></div>
+        </section>
+        <section class="card">
+          <h2>Crew mood</h2>
+          <div class="crew" id="crew"></div>
+        </section>
+      </div>
+      <div>
+        <section class="card">
+          <h2>Science lab upgrades</h2>
+          <div id="ups"></div>
+        </section>
+        <section class="card">
+          <h2>Mission log</h2>
+          <ul id="log"></ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- DILEMMA -->
+  <div id="veil" class="veil" hidden>
+    <div class="card dil" role="dialog" aria-modal="true" id="dilBox"></div>
+  </div>
+
+  <!-- END -->
+  <main id="end" class="wrap" hidden>
+    <div class="card endc" id="endBox"></div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+     MARS OUTPOST ALPHA — Hackathon Game Mode
+     Entirely self-contained: own screens, own state, own renderer.
+     Does NOT touch the existing lobby/game/end flow above.
+════════════════════════════════════════════════════════════════ -->
+
+  <!-- MOA: BRIEFING SCREEN -->
+  <main id="moa-briefing" class="wrap" hidden>
+    <!-- Top nav bar: Mission Control button left, guide button right -->
+    <div
+      style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <button id="moa-briefing-mc-btn" class="btn moa-mc-btn"
+        style="background:linear-gradient(90deg,#1a0a2e,#2d1b4e);color:#ffd2a6;border:2px solid #f2b63c;font-size:1rem;padding:8px 16px;box-shadow:3px 3px 0 var(--ink);cursor:pointer">
+        🚀 Mission Control
+      </button>
+      <button id="moa-guide-btn" class="btn"
+        style="background:#bfe0f2;font-size:1rem;padding:8px 16px;box-shadow:3px 3px 0 var(--ink)">
+        📖 Mission Guide
+      </button>
+    </div>
+    <div class="card hero"
+      style="background:linear-gradient(135deg,#1a0a2e 0%,#2d1b4e 40%,#8b2500 100%);color:#fff3e2;border-color:#f28b6e">
+      <svg viewBox="0 0 200 120" aria-hidden="true">
+        <circle cx="100" cy="40" r="30" fill="#c1440e" stroke="#f2b63c" stroke-width="3" />
+        <ellipse cx="100" cy="40" rx="48" ry="10" fill="none" stroke="#f2b63c" stroke-width="2" opacity=".6" />
+        <path d="M60 90 Q80 70 100 85 T140 78 V110 H60Z" fill="#8b2500" stroke="#f2b63c" stroke-width="2" />
+        <rect x="88" y="78" width="24" height="12" rx="4" fill="#bfe0f2" stroke="#f2b63c" stroke-width="2" />
+        <rect x="94" y="68" width="12" height="10" rx="2" fill="#f2b63c" stroke="#3b2c2a" stroke-width="1" />
+        <circle cx="30" cy="20" r="4" fill="#ffe8a3" opacity=".9" />
+        <circle cx="170" cy="15" r="2.5" fill="#ffe8a3" opacity=".7" />
+        <circle cx="155" cy="50" r="2" fill="#86b9f5" opacity=".8" />
+        <circle cx="45" cy="60" r="1.5" fill="#ffe8a3" opacity=".6" />
+        <circle cx="180" cy="80" r="1.8" fill="#86b9f5" opacity=".7" />
+      </svg>
+      <div>
+        <h1 style="color:#f2b63c;font-size:2rem;line-height:1.1">🚀 Mars Outpost Alpha</h1>
+        <p style="color:#fff3e2;margin-top:8px;font-size:1.05rem">Mission Briefing — Day 1 approaching. Four systems, 10
+          days, zero margin for error.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h2 style="font-size:1.3rem;margin-bottom:10px">📋 Mission Parameters</h2>
+      <div id="moa-briefing-grid"
+        style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px">
+        <div class="card" style="background:var(--butter);text-align:center;padding:14px">
+          <div style="font-size:2rem">⚡</div><b>Power</b>
+          <div style="font-size:1.5rem;font-weight:800;color:#c8600a">100%</div>
+        </div>
+        <div class="card" style="background:#d4f1ff;text-align:center;padding:14px">
+          <div style="font-size:2rem">🫧</div><b>Oxygen</b>
+          <div style="font-size:1.5rem;font-weight:800;color:#1a6e9c">100%</div>
+        </div>
+        <div class="card" style="background:#dce8ff;text-align:center;padding:14px">
+          <div style="font-size:2rem">🛡️</div><b>Shields</b>
+          <div style="font-size:1.5rem;font-weight:800;color:#2a3fa0">100%</div>
+        </div>
+        <div class="card" style="background:var(--sage);text-align:center;padding:14px">
+          <div style="font-size:2rem">❤️</div><b>Crew Health</b>
+          <div style="font-size:1.5rem;font-weight:800;color:#1a7a40">100%</div>
+        </div>
+      </div>
+      <div class="card how" style="margin-bottom:12px">
+        <h2>Mission Rules</h2>
+        <ol>
+          <li>All 4 systems start at <b>100%</b>. Keep them above zero for 10 days.</li>
+          <li>Each day brings a real space-weather event. Choose <b>Option A or B</b>.</li>
+          <li>If any system drops below <b>30%</b> — yellow alert! Below <b>0%</b> — mission failed.</li>
+          <li>Survive all 10 days to earn your <b>3-Star Mission Certificate</b>!</li>
+        </ol>
+      </div>
+      <p style="font-size:.88rem;opacity:.7;text-align:center;margin-bottom:10px">
+        🛰️ Grounded in real NASA DONKI &amp; WSA-ENLIL Space Weather Data
+      </p>
+      <button id="moa-init" class="btn launch" style="background:#f2b63c;border-color:#3b2c2a">🚀 Initialize
+        Mission</button>
+    </div>
+  </main>
+
+  <!-- MOA: GAME SCREEN -->
+  <main id="moa-game" class="wrap" hidden>
+    <!-- Top in-game action bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button id="moa-game-mc-btn" class="btn moa-mc-btn"
+          style="background:linear-gradient(90deg,#1a0a2e,#2d1b4e);color:#ffd2a6;border:2px solid #f2b63c;font-size:0.95rem;padding:7px 15px;box-shadow:3px 3px 0 var(--ink);cursor:pointer">
+          🚀 Mission Control
+        </button>
+        <button id="moa-game-guide-btn" class="btn"
+          style="background:#bfe0f2;font-size:0.95rem;padding:7px 15px;box-shadow:3px 3px 0 var(--ink);cursor:pointer">
+          📖 Mission Guide
+        </button>
+      </div>
+      <button id="moa-quit-btn" class="btn"
+        style="background:#ffd0c4;color:#7a1a1a;border:2px solid #7a1a1a;font-size:0.95rem;padding:7px 15px;box-shadow:3px 3px 0 #7a1a1a;cursor:pointer">
+        ❌ Quit Mission
+      </button>
+    </div>
+
+    <!-- Day header -->
+    <div class="card top"
+      style="background:linear-gradient(90deg,#1a0a2e,#2d1b4e);color:#fff3e2;border-color:#f2b63c;margin-bottom:14px">
+      <div class="grow">
+        <div class="sol hd" id="moa-day-txt" style="color:#f2b63c"></div>
+        <div class="prog" style="border-color:#f2b63c;margin:4px 0"><i id="moa-prog-fill"
+            style="background:#f2b63c"></i></div>
+        <div id="moa-event-name" style="font-weight:800;color:#ffd2a6;font-size:1rem"></div>
+      </div>
+    </div>
+
+    <!-- Warning banner -->
+    <div id="moa-warn" class="alert" role="alert" aria-live="assertive" hidden
+      style="background:#ffe680;border-color:#c8600a;color:#3b2c2a">
+    </div>
+
+    <!-- HUD: 4 meters -->
+    <div id="moa-hud"
+      style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px"
+      aria-live="polite"></div>
+
+    <!-- Main content: scenario + actions -->
+    <div class="main">
+      <div>
+        <section class="card" style="margin-bottom:14px">
+          <h2>📡 Today's Situation</h2>
+          <div id="moa-scenario" style="margin-bottom:10px;line-height:1.5"></div>
+          <div id="moa-tip" class="fact" style="margin-bottom:0"></div>
+        </section>
+        <section class="card">
+          <h2>🎮 Choose Your Action</h2>
+          <div id="moa-actions"></div>
+          <div id="moa-choice-result" hidden
+            style="margin-top:10px;padding:10px 12px;background:var(--butter);border:2px solid var(--ink);border-radius:12px;font-weight:800">
+          </div>
+        </section>
+      </div>
+      <div>
+        <section class="card" style="margin-bottom:14px">
+          <h2>📰 Mission Log</h2>
+          <ul id="moa-log" style="margin:0;padding-left:18px;font-size:.92rem"></ul>
+        </section>
+        <section class="card">
+          <div style="font-size:.85rem;opacity:.75;line-height:1.5">
+            🛰️ <b>Data Source:</b> Grounded in real NASA DONKI &amp; WSA-ENLIL Space Weather Data
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Next day button -->
+    <div style="text-align:center;margin:20px 0 8px">
+      <button id="moa-next" class="btn" style="font-size:1.3rem;padding:12px 32px" disabled>
+        ➡️ Next Day
+      </button>
+    </div>
+
+    <!-- Footer attribution always visible -->
+    <div style="text-align:center;padding:10px 0 16px;font-size:.82rem;opacity:.65">
+      🛰️ Grounded in real NASA DONKI &amp; WSA-ENLIL Space Weather Data
+    </div>
+  </main>
+
+  <!-- MOA: ACTION/CHOICE CUTSCENE ANIMATION OVERLAY (1.5s real-time delta animation) -->
+  <div id="moa-choice-overlay" class="moa-choice-overlay" hidden>
+    <div class="moa-choice-card">
+      <div class="moa-choice-pulse-ring"></div>
+      <div id="moa-choice-icon" class="moa-choice-icon">⚡</div>
+      <div id="moa-choice-title" class="moa-choice-title">Charge Batteries</div>
+      <div class="moa-choice-subtitle">Executing Outpost Directive...</div>
+      <div id="moa-choice-deltas" class="moa-choice-deltas"></div>
+    </div>
+  </div>
+
+  <!-- MOA: PRE-DAY CUTSCENE OVERLAY (Granny-style day intro) -->
+  <div id="moa-day-cutscene" class="moa-cutscene-overlay" hidden>
+    <div id="moa-cutscene-sol" class="moa-cutscene-sol">DAY 1</div>
+    <div id="moa-cutscene-sub" class="moa-cutscene-sub">“The silence outside the dome is deafening...”</div>
+    <button id="moa-cutscene-continue" class="moa-cutscene-btn">Continue to Mission</button>
+  </div>
+
+  <!-- MOA: IN-GAME STATUS / MISSION CONTROL MODAL -->
+  <div id="moa-mc-modal" class="moa-modal-veil" hidden>
+    <div class="moa-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px">
+        <h2 style="font-size:1.35rem;display:flex;align-items:center;gap:8px">🚀 In-Game Status &amp; Briefing</h2>
+        <span id="moa-mc-badge" class="badge" style="position:static;font-size:.85rem;padding:3px 9px;background:#ffd75e">Day 1</span>
+      </div>
+      <div id="moa-mc-recap" style="background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;margin-bottom:12px"></div>
+      <h3 style="font-size:1.1rem;margin-bottom:6px">⚙️ Current Systems Status</h3>
+      <div id="moa-mc-meters-grid" class="moa-mc-grid"></div>
+      <div style="background:var(--butter);border:2px solid var(--ink);border-radius:12px;padding:10px 14px;margin-bottom:16px">
+        <h4 style="margin:0 0 6px;font-family:'Baloo 2',sans-serif;font-size:1.05rem">📋 Mission Objectives</h4>
+        <ul style="margin:0;padding-left:18px;font-size:0.9rem;line-height:1.55">
+          <li><b>Survive 10 Days:</b> Keep outpost operational through all space-weather cycles.</li>
+          <li><b>Avoid Critical Drain:</b> If any meter drops below 30%, immediate warning triggers.</li>
+          <li><b>Zero Tolerance:</b> If any system reaches 0%, mission ends in failure.</li>
+          <li><b>3-Star Goal:</b> Keep average system status high for full certificate honors.</li>
+        </ul>
+      </div>
+      <button id="moa-mc-close" class="btn alt" style="width:100%;font-size:1.15rem">Close</button>
+    </div>
+  </div>
+
+  <!-- MOA: QUIT CONFIRMATION MODAL -->
+  <div id="moa-quit-modal" class="moa-modal-veil" hidden>
+    <div class="moa-modal-box" style="max-width:480px;text-align:center">
+      <div style="font-size:2.8rem;margin-bottom:4px">⚠️</div>
+      <h2 style="font-size:1.45rem;margin-bottom:10px">Abort Mission?</h2>
+      <p style="font-size:1.05rem;line-height:1.5;margin-bottom:20px;color:var(--ink)">
+        Are you sure you want to abort the mission? All outpost progress will be lost.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button id="moa-confirm-quit" class="btn" style="background:#ffd0c4;color:#7a1a1a;border:2px solid #7a1a1a;width:100%;font-size:1.1rem">
+          Yes, Quit to Main Menu
+        </button>
+        <button id="moa-cancel-quit" class="btn alt" style="width:100%;font-size:1.1rem">
+          Cancel (Continue Mission)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOA: GAME OVER / VICTORY SCREEN -->
+  <main id="moa-end" class="wrap" hidden>
+    <div class="card endc" id="moa-end-box" style="max-width:640px;margin:30px auto">
+    </div>
+    <div style="text-align:center;padding:10px 0 16px;font-size:.82rem;opacity:.65">
+      🛰️ Grounded in real NASA DONKI &amp; WSA-ENLIL Space Weather Data
+    </div>
+  </main>
+
+  <script>
+    /* ================================================================
+       MARS OUTPOST ALPHA — hackathon game engine  v2
+       Isolated IIFE namespace. Zero shared state with the original game.
+       New in v2: loading overlay, mission-launch transition, guide page.
+    ================================================================ */
+    (function () {
+      'use strict';
+
+      /* ── Utility helpers ─────────────────────────────────────── */
+      const $q = (sel) => document.querySelector(sel);
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+      window.clamp = clamp;
+      const escH = (s) => String(s).replace(/[&<>"]/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      /* ── Screen switcher ─────────────────────────────────────── */
+      // All MOA-owned screen ids (loader excluded — it's position:fixed)
+      const MOA_SCREENS = ['moa-briefing', 'moa-game', 'moa-end', 'moa-guide'];
+
+      function moaShow(id) {
+        MOA_SCREENS.forEach((s) => { $q('#' + s).hidden = (s !== id); });
+        window.scrollTo(0, 0);
+      }
+
+      /* ── Loading overlay ─────────────────────────────────────── */
+      let _loaderTimer = null; // single active timer — cleared on re-use
+
+      /**
+       * moaLoader(show, headline, sub, durationMs, onDone)
+       *   show       — true = reveal overlay, false = hide it
+       *   headline   — text for the pulsing headline (ignored when show=false)
+       *   sub        — smaller sub-text (ignored when show=false)
+       *   durationMs — auto-hide after this many ms (0 = manual hide)
+       *   onDone     — callback fired after the overlay finishes hiding
+       */
+      function moaLoader(show, headline, sub, durationMs, onDone) {
+        // Always clear any pending timer first to avoid overlap
+        if (_loaderTimer !== null) {
+          clearTimeout(_loaderTimer);
+          _loaderTimer = null;
+        }
+
+        const overlay = $q('#moa-loader');
+        const headEl = $q('#moa-load-headline');
+        const subEl = $q('#moa-load-sub');
+        if (!overlay) return;
+
+        if (!show) {
+          // Hide path: fade-out class → wait for transition → remove from flow
+          overlay.classList.add('fade-out');
+          _loaderTimer = setTimeout(() => {
+            _loaderTimer = null;
+            overlay.hidden = true;
+            overlay.classList.remove('fade-out');
+            if (typeof onDone === 'function') onDone();
+          }, 520); // matches CSS transition duration + tiny buffer
+          return;
+        }
+
+        // Show path
+        if (headEl) headEl.textContent = headline || '';
+        if (subEl) subEl.textContent = sub || '';
+        overlay.hidden = false;
+        overlay.classList.remove('fade-out'); // ensure fully visible
+
+        if (durationMs > 0) {
+          _loaderTimer = setTimeout(() => {
+            _loaderTimer = null;
+            moaLoader(false, '', '', 0, onDone);
+          }, durationMs);
+        }
+      }
+
+      /* ── Shift metadata ──────────────────────────────────────── */
+      const MOA_SHIFTS = [
+        { id: 'morning', name: 'Morning Shift', label: '☀️ Morning Shift', tag: '☀️ Morning Shift' },
+        { id: 'evening', name: 'Evening Shift', label: '🌇 Evening Shift', tag: '🌇 Evening Shift' },
+        { id: 'night',   name: 'Night Shift',   label: '🌙 Night Shift',   tag: '🌙 Night Shift' }
+      ];
+
+      /* ── 10-Day Dataset (Untouched & Modular) ─────────────────── */
+      const MOA_DAYS = [
+        {
+          title: 'Calm Space Weather',
+          kp: 'Kp Index: 3.0',
+          tip: 'Kp Index 0–9 — green (Kp < 5) means calm space weather. Perfect day to get work done!',
+          btnA: { label: '🔋 Charge Batteries', desc: 'Run the charging cycle to top up reserves.', fx: { power: +12, o2: -8, health: -8, shields: 0 } },
+          btnB: { label: '🛡️ Reinforce Hull', desc: 'Patch and reinforce the outpost hull plating.', fx: { power: -8, o2: 0, health: 0, shields: +12 } }
+        },
+        {
+          title: 'Geomagnetic Storm',
+          kp: 'Kp Index: 5.3 & 5.0',
+          tip: 'Kp ≥ 5 scrambles radio communications and can disrupt onboard navigation systems!',
+          btnA: { label: '📡 Boost Radio', desc: 'Amplify the comms array to cut through static.', fx: { power: -10, o2: 0, health: 0, shields: 0 } },
+          btnB: { label: '🔌 Conserve Power', desc: 'Shut non-essentials and ride out the storm.', fx: { power: 0, o2: 0, health: 0, shields: -8 } }
+        },
+        {
+          title: 'Fast Solar Eruption (CME)',
+          kp: 'CME Speed: 591 km/s',
+          tip: 'Coronal Mass Ejections travel at ~2 million km/h and slam charged particles into Mars.',
+          btnA: { label: '🧲 Magnetic Deflectors', desc: 'Fire up deflector arrays to redirect CME flux.', fx: { power: -10, o2: 0, health: 0, shields: 0 } },
+          btnB: { label: '🚙 Keep Rovers Out', desc: 'Leave rovers deployed to collect rock samples.', fx: { power: +12, o2: 0, health: 0, shields: -12 } }
+        },
+        {
+          title: 'Water Recycler Trade-Off',
+          kp: 'Internal Event',
+          tip: 'Real astronauts on the ISS recycle over 90% of water — even sweat and exhaled breath!',
+          btnA: { label: '💧 Extra Water Ration', desc: 'Run a full recycling cycle for extra water.', fx: { power: -8, o2: -10, health: +15, shields: 0 } },
+          btnB: { label: '🌬️ Water to Oxygen', desc: 'Electrolyze water to produce extra oxygen.', fx: { power: 0, o2: +12, health: -10, shields: 0 } }
+        },
+        {
+          title: 'Greenhouse & Fresh Food',
+          kp: 'Internal Event',
+          tip: 'Space plants convert CO₂ into oxygen — growing food and purifying air at the same time.',
+          btnA: { label: '💡 Full Grow-Lights', desc: 'Max the lights for a bumper harvest.', fx: { power: -12, o2: +15, health: +10, shields: 0 } },
+          btnB: { label: '🔅 Dim the Lights', desc: 'Save power — plants grow slower but survive.', fx: { power: +12, o2: -10, health: 0, shields: 0 } }
+        },
+        {
+          title: 'Double Solar Flares',
+          kp: 'M1.9 & M1.7 Flares',
+          tip: 'Solar flares are ranked C → M → X. M-class flares can disrupt electronics and comms.',
+          btnA: { label: '🏠 Seal the Bunker', desc: 'Lock down the outpost — full radiation lockout.', fx: { power: -10, o2: -10, health: 0, shields: 0 } },
+          btnB: { label: '🔬 Science Lab Run', desc: 'Use flare energy to supercharge experiments.', fx: { power: 0, o2: 0, health: 0, shields: -14 } }
+        },
+        {
+          title: 'Martian Red Dust Storm',
+          kp: 'Dust Opacity: High',
+          tip: 'Martian dust storms can blanket the whole planet and block solar panels for weeks!',
+          btnA: { label: '🧹 Brush Solar Panels', desc: 'EVA to wipe panels clean during the storm.', fx: { power: +15, o2: -10, health: 0, shields: 0 } },
+          btnB: { label: '🏠 Stay Inside', desc: 'Protect the crew — let the storm pass.', fx: { power: -10, o2: +8, health: -10, shields: -8 } }
+        },
+        {
+          title: 'Zero-G Exercise & Mood',
+          kp: 'Internal Event',
+          tip: 'Astronauts must exercise 2+ hours per day — microgravity weakens muscles and bones fast.',
+          btnA: { label: '🏋️ Full Gym & Music', desc: 'Full workout session with music from home.', fx: { power: -10, o2: -8, health: +15, shields: 0 } },
+          btnB: { label: '😴 Skip the Workout', desc: 'Rest up and conserve power.', fx: { power: +10, o2: 0, health: -12, shields: 0 } }
+        },
+        {
+          title: 'Direct Mars CME Impact',
+          kp: 'WSA-ENLIL Speed: 726 km/s',
+          tip: 'Glancing CME blows send bursts of radiation. A direct hit is the worst-case scenario.',
+          btnA: { label: '🛡️ Shield Boost', desc: 'Divert all power to radiation shield arrays.', fx: { power: -12, o2: -8, health: 0, shields: 0 } },
+          btnB: { label: '🫁 O₂ Tank Refill', desc: 'Prioritize life support — fill the O₂ tanks.', fx: { power: 0, o2: +12, health: 0, shields: -12 } }
+        },
+        {
+          title: 'Final Supply Rocket Landing',
+          kp: 'Earth–Mars Delay: 20 min',
+          tip: 'Earth–Mars radio delay is up to 20 minutes one way — rockets must land autonomously!',
+          btnA: { label: '📡 Radar Beacons', desc: 'Activate precision landing radar to guide it in.', fx: { power: -12, o2: +12, health: +10, shields: +12 } },
+          btnB: { label: '📷 Visual Camera', desc: 'Use optical cameras only — lower power draw.', fx: { power: 0, o2: 0, health: 0, shields: -12 } }
+        }
+      ];
+
+      /* ── 4 Modular Shift Options (A, B, C, D) ─────────────────── */
+      function moaGetShiftOptions(day) {
+        return [
+          { key: 'A', label: day.btnA.label, desc: day.btnA.desc, fx: day.btnA.fx },
+          { key: 'B', label: day.btnB.label, desc: day.btnB.desc, fx: day.btnB.fx },
+          {
+            key: 'C',
+            label: '🫧 Boost Oxygen Scrubbers',
+            desc: 'Divert power to refresh cabin air.',
+            fx: { power: -10, o2: +15, shields: 0, health: +5 }
+          },
+          {
+            key: 'D',
+            label: '❤️ Crew Rest & Med-Bay Cycle',
+            desc: 'Lower non-essential shields so the crew can hydrate and recover.',
+            fx: { power: +5, o2: 0, shields: -10, health: +15 }
+          }
+        ];
+      }
+
+      /* ── Meter config ────────────────────────────────────────── */
+      const MOA_METERS = [
+        { key: 'power', label: 'Power', icon: '⚡', color: '#ffd75e', darkColor: '#c8600a' },
+        { key: 'o2', label: 'Oxygen', icon: '🫧', color: '#8fd3f0', darkColor: '#1a6e9c' },
+        { key: 'shields', label: 'Shields', icon: '🛡️', color: '#b0c4f8', darkColor: '#2a3fa0' },
+        { key: 'health', label: 'Crew Health', icon: '❤️', color: '#a8da8f', darkColor: '#1a7a40' }
+      ];
+
+      /* ── Game state ──────────────────────────────────────────── */
+      let MS = null;           // Mars Outpost game state
+      let _prevView = null;    // last non-guide view (for Back button)
+      let _choiceTimer = null; // choice animation 1.5s timer
+      let _choiceFadeTimer = null; // choice overlay fade-out timer
+      let _isChoiceAnimating = false; // re-entrancy lock during choice cutscene
+
+      function moaClearAllTimers() {
+        if (_loaderTimer !== null) { clearTimeout(_loaderTimer); _loaderTimer = null; }
+        if (_choiceTimer !== null) { clearTimeout(_choiceTimer); _choiceTimer = null; }
+        if (_choiceFadeTimer !== null) { clearTimeout(_choiceFadeTimer); _choiceFadeTimer = null; }
+        _isChoiceAnimating = false;
+      }
+
+      function moaNewState() {
+        return {
+          day: 1,
+          currentShift: 0,       // 0 = Morning, 1 = Evening, 2 = Night
+          chosen: false,
+          pendingChoice: null,   // 'A' | 'B' | 'C' | 'D' | null
+          done: false,
+          log: [],
+          v: { power: 100, o2: 100, shields: 100, health: 100 }
+        };
+      }
+
+      /* ── State mutators (safe, clamped) ─────────────────────── */
+      function moaApply(fx) {
+        if (!MS || !MS.v) return;
+        ['power', 'o2', 'shields', 'health'].forEach((k) => {
+          if (fx && fx[k] !== undefined && fx[k] !== 0) {
+            MS.v[k] = clamp(MS.v[k] + fx[k], 0, 100);
+          }
+        });
+      }
+
+      function moaLog(msg) {
+        if (!MS || !MS.log) return;
+        MS.log.unshift(msg);
+        if (MS.log.length > 8) MS.log.length = 8;
+      }
+
+      /* ── Render HUD ──────────────────────────────────────────── */
+      function moaRenderHUD() {
+        const hud = $q('#moa-hud');
+        if (!hud) return;
+        let warningKeys = [];
+        hud.innerHTML = MOA_METERS.map((m) => {
+          const val = (MS && MS.v && MS.v[m.key] !== undefined) ? MS.v[m.key] : 100;
+          const pct = clamp(val, 0, 100);
+          const isLow = pct < 30;
+          const isCrit = pct <= 0;
+          if (isLow) warningKeys.push(m.label);
+          return `
+        <div class="tile${isLow ? ' low' : ''}" style="${isCrit ? 'background:#ffa0a0;' : ''}">
+          <div class="hd">
+            <span>${m.icon} ${m.label}</span>
+            <b>${pct}%</b>
+          </div>
+          <div class="bar">
+            <i style="width:${pct}%;background:${isLow ? '#f28b6e' : m.color}"></i>
+          </div>
+          ${isLow ? '<span class="badge">' + (isCrit ? 'DEAD' : 'LOW!') + '</span>' : ''}
+        </div>`;
+        }).join('');
+
+        const warn = $q('#moa-warn');
+        if (!warn) return;
+        if (warningKeys.length > 0) {
+          warn.hidden = false;
+          warn.innerHTML = `⚠️ <b>WARNING:</b> ${warningKeys.join(', ')} ${warningKeys.length === 1 ? 'is' : 'are'} critically low (below 30%)! Take action now!`;
+        } else {
+          warn.hidden = true;
+        }
+      }
+
+      /* ── Render day scenario & 4 choices ─────────────────────── */
+      function moaRenderDay() {
+        if (!MS) return;
+        const dayIdx = clamp(MS.day - 1, 0, MOA_DAYS.length - 1);
+        const shiftIdx = clamp(MS.currentShift, 0, 2);
+        const day = MOA_DAYS[dayIdx];
+        if (!day) return;
+        const shiftMeta = MOA_SHIFTS[shiftIdx];
+
+        // 1. Header indicator: DAY X • ☀️ Morning Shift
+        const dayTxt = $q('#moa-day-txt');
+        if (dayTxt) dayTxt.textContent = `DAY ${MS.day} • ${shiftMeta.tag}`;
+
+        // 2. Mission Progress Fill across 30 shifts
+        const progFill = $q('#moa-prog-fill');
+        if (progFill) {
+          const completedShifts = (MS.day - 1) * 3 + MS.currentShift;
+          progFill.style.width = Math.min(100, Math.round((completedShifts / 30) * 100)) + '%';
+        }
+
+        const eventName = $q('#moa-event-name');
+        if (eventName) eventName.textContent = `📡 ${day.title}  ·  ${day.kp}`;
+
+        const scenEl = $q('#moa-scenario');
+        if (scenEl) {
+          scenEl.innerHTML = `<b style="font-size:1.1rem">${escH(day.title)}</b><br><span style="opacity:.85;font-size:0.95rem"><b>Shift Directive:</b> ${escH(shiftMeta.label)}</span><br><span style="opacity:.7;font-size:0.85rem">Real NASA DONKI record: ${escH(day.kp)}</span>`;
+        }
+
+        const tipEl = $q('#moa-tip');
+        if (tipEl) tipEl.innerHTML = `🔭 <b>Space Science Tip:</b> ${escH(day.tip)}`;
+
+        // 3. Render 4 choices (A, B, C, D) + Select-then-Confirm button
+        const actEl = $q('#moa-actions');
+        if (actEl) {
+          const disable = !!MS.chosen || _isChoiceAnimating;
+          const options = moaGetShiftOptions(day);
+          const optionsHTML = options.map((opt) => {
+            const isSel = !disable && MS.pendingChoice === opt.key;
+            return moaBtnHTML(opt, opt.key, disable, isSel);
+          }).join('');
+
+          const selectedOpt = options.find((o) => o.key === MS.pendingChoice);
+          const confirmDisabled = !selectedOpt || disable;
+          const confirmLabel = selectedOpt
+            ? `Confirm: [${selectedOpt.key}] ${selectedOpt.label}`
+            : 'Select an Option (A, B, C, or D)';
+
+          actEl.innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px">
+              ${optionsHTML}
+            </div>
+            <div id="moa-confirm-wrap" style="margin-top:14px;text-align:center">
+              <button data-moa-confirm="1"
+                style="font-size:1.05rem;padding:11px 28px;border-radius:10px;
+                       background:${confirmDisabled ? '#ccc' : '#f2b63c'};
+                       color:${confirmDisabled ? '#888' : '#3b2c2a'};
+                       border:2px solid ${confirmDisabled ? '#bbb' : '#c8600a'};
+                       font-weight:800;cursor:${confirmDisabled ? 'not-allowed' : 'pointer'};
+                       box-shadow:${confirmDisabled ? 'none' : '3px 3px 0 var(--ink)'};
+                       transition:all .2s;width:100%;max-width:440px"
+                ${confirmDisabled ? 'disabled' : ''}>
+                ✅ ${escH(confirmLabel)}
+              </button>
+            </div>
+          `;
+        }
+
+        const nextBtn = $q('#moa-next');
+        if (nextBtn) {
+          nextBtn.hidden = true;
+          nextBtn.disabled = true;
+        }
+
+        const logEl = $q('#moa-log');
+        if (logEl) {
+          logEl.innerHTML = MS.log.map((t) => `<li>${escH(t)}</li>`).join('') ||
+            '<li style="opacity:.5">No events yet.</li>';
+        }
+
+        moaRenderHUD();
+      }
+
+      /* ── Build action button HTML (4 options A/B/C/D) ────────── */
+      function moaBtnHTML(btn, label, disabled, selected) {
+        const fx = btn.fx || {};
+        const icons = { power: '⚡', o2: '🫧', shields: '🛡️', health: '❤️' };
+        const tags = ['power', 'o2', 'shields', 'health'].map((k) => {
+          const v = fx[k];
+          if (!v) return '';
+          const cls = v > 0 ? 'up' : 'dn';
+          const sign = v > 0 ? '+' : '−';
+          return `<span class="fx ${cls}">${icons[k]} ${sign}${Math.abs(v)}%</span>`;
+        }).join('');
+
+        const selStyle = selected
+          ? 'outline:3px solid #f2b63c;outline-offset:2px;background:#fff9ec;border-color:#c8600a;transform:scale(1.01);'
+          : '';
+
+        return `
+      <button class="act${selected ? ' moa-selected' : ''}" data-moa-btn="${label}" ${disabled ? 'disabled' : ''} style="${selStyle}">
+        <span class="ai" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;min-width:34px;border-radius:8px;background:${selected ? '#f2b63c' : '#1a0a2e'};color:${selected ? '#3b2c2a' : '#ffd2a6'};font-weight:900;font-size:1.15rem;border:2px solid ${selected ? '#c8600a' : '#f2b63c'};box-shadow:1px 1px 0 rgba(0,0,0,0.2)">${label}</span>
+        <span style="flex:1">
+          <b style="font-size:0.95rem;display:block">${escH(btn.label)}</b>
+          <small style="opacity:.85;font-size:0.82rem;line-height:1.3">${escH(btn.desc)}</small>
+          <div style="margin-top:4px">${tags}</div>
+        </span>
+      </button>`;
+      }
+
+      /* ── Fx summary string (for log) ─────────────────────────── */
+      function moaFxSummary(fx) {
+        if (!fx) return '';
+        const icons = { power: '⚡', o2: '🫧', shields: '🛡️', health: '❤️' };
+        return ['power', 'o2', 'shields', 'health']
+          .filter((k) => fx[k] && fx[k] !== 0)
+          .map((k) => `${icons[k]}${fx[k] > 0 ? '+' : ''}${fx[k]}%`)
+          .join(' ');
+      }
+
+      /* ── Check game-over conditions (0% = failure) ───────────── */
+      function moaCheck() {
+        if (!MS || !MS.v) return false;
+        const v = MS.v;
+        const dead = ['power', 'o2', 'shields', 'health'].find((k) => v[k] <= 0);
+        if (dead) {
+          const names = { power: 'Power', o2: 'Oxygen', shields: 'Shields', health: 'Crew Health' };
+          MS.done = true;
+          moaFinish(false, `${names[dead]} reached 0%.`);
+          return true;
+        }
+        return false;
+      }
+
+      /* ── Select Option (highlight freely, no commit yet) ─────── */
+      function moaSelectOption(label) {
+        if (!MS || MS.chosen || MS.done || _isChoiceAnimating) return;
+        if (!['A', 'B', 'C', 'D'].includes(label)) return;
+        MS.pendingChoice = label;
+        moaRenderDay();
+      }
+
+      /* ── Handle choice confirmation with 1.5s Animation Overlay ── */
+      function moaChoose(label) {
+        if (!label || !['A', 'B', 'C', 'D'].includes(label)) return;
+        if (!MS || MS.chosen || MS.done || _isChoiceAnimating) return;
+        const dayIdx = clamp(MS.day - 1, 0, MOA_DAYS.length - 1);
+        const shiftIdx = clamp(MS.currentShift, 0, 2);
+        const day = MOA_DAYS[dayIdx];
+        if (!day) return;
+        const options = moaGetShiftOptions(day);
+        const btn = options.find((o) => o.key === label);
+        if (!btn) return;
+
+        // Set re-entrancy lock and flag
+        MS.chosen = true;
+        _isChoiceAnimating = true;
+
+        // Disable all action & confirm buttons
+        const actButtons = document.querySelectorAll('#moa-actions button');
+        actButtons.forEach((b) => { b.disabled = true; });
+
+        // Extract action icon and title
+        const iconMatch = btn.label.match(/^(\S+)/);
+        const actionIcon = iconMatch ? iconMatch[1] : '⚡';
+        const actionTitle = btn.label.replace(/^\S+\s*/, '') || btn.label;
+
+        // Delta feedback pills
+        const deltaIcons = { power: '⚡', o2: '🫧', shields: '🛡️', health: '❤️' };
+        const deltasHTML = ['power', 'o2', 'shields', 'health']
+          .filter((k) => btn.fx[k] && btn.fx[k] !== 0)
+          .map((k) => {
+            const val = btn.fx[k];
+            const isUp = val > 0;
+            const sign = isUp ? '+' : '';
+            return `<span class="moa-delta-pill ${isUp ? 'up' : 'dn'}">${deltaIcons[k]} ${sign}${val}%</span>`;
+          }).join(' ');
+
+        // Populate overlay
+        const overlay = $q('#moa-choice-overlay');
+        const iconEl = $q('#moa-choice-icon');
+        const titleEl = $q('#moa-choice-title');
+        const deltasEl = $q('#moa-choice-deltas');
+
+        if (iconEl) iconEl.textContent = actionIcon;
+        if (titleEl) titleEl.textContent = actionTitle;
+        if (deltasEl) deltasEl.innerHTML = deltasHTML || '<span class="moa-delta-pill up">No System Drain</span>';
+
+        if (_choiceTimer !== null) { clearTimeout(_choiceTimer); _choiceTimer = null; }
+        if (_choiceFadeTimer !== null) { clearTimeout(_choiceFadeTimer); _choiceFadeTimer = null; }
+
+        // Trigger 1.5-second cinematic cutscene overlay
+        if (overlay) {
+          overlay.classList.remove('fade-out');
+          overlay.hidden = false;
+        }
+
+        // Wait 1.5 seconds (1500 ms) before updating stats, fading out, and progressing
+        _choiceTimer = setTimeout(() => {
+          _choiceTimer = null;
+          _isChoiceAnimating = false;
+
+          if (!MS || MS.done) return;
+
+          // Apply state changes
+          moaApply(btn.fx);
+          moaLog(`Day ${MS.day} (${MOA_SHIFTS[shiftIdx].name}): [${label}] ${btn.label}${moaFxSummary(btn.fx) ? ' → ' + moaFxSummary(btn.fx) : ''}`);
+
+          // Fade out overlay
+          if (overlay) {
+            overlay.classList.add('fade-out');
+            _choiceFadeTimer = setTimeout(() => {
+              _choiceFadeTimer = null;
+              overlay.hidden = true;
+              overlay.classList.remove('fade-out');
+            }, 300);
+          }
+
+          // Check for 0% game-over condition
+          if (moaCheck()) return;
+
+          // Progression: Morning (0) -> Evening (1) -> Night (2) -> Next Day (0)
+          if (MS.currentShift === 0) {
+            MS.currentShift = 1;
+            MS.chosen = false;
+            MS.pendingChoice = null;
+            const resultEl = $q('#moa-choice-result');
+            if (resultEl) {
+              resultEl.hidden = false;
+              resultEl.innerHTML = `✅ <b>☀️ Morning Shift Completed:</b> [${label}] ${escH(btn.label)}<br>
+                <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">${deltasHTML || '<span style="font-weight:600;opacity:.85">No resource change.</span>'}</div>`;
+            }
+            moaRenderDay();
+          } else if (MS.currentShift === 1) {
+            MS.currentShift = 2;
+            MS.chosen = false;
+            MS.pendingChoice = null;
+            const resultEl = $q('#moa-choice-result');
+            if (resultEl) {
+              resultEl.hidden = false;
+              resultEl.innerHTML = `✅ <b>🌇 Evening Shift Completed:</b> [${label}] ${escH(btn.label)}<br>
+                <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">${deltasHTML || '<span style="font-weight:600;opacity:.85">No resource change.</span>'}</div>`;
+            }
+            moaRenderDay();
+          } else {
+            // currentShift === 2 (Night shift finished!)
+            if (MS.day >= 10) {
+              MS.done = true;
+              moaFinish(true);
+              return;
+            }
+            MS.day++;
+            MS.currentShift = 0;
+            MS.chosen = false;
+            MS.pendingChoice = null;
+            const resultEl = $q('#moa-choice-result');
+            if (resultEl) {
+              resultEl.hidden = true;
+              resultEl.innerHTML = '';
+            }
+            moaRenderDay();
+            moaShowCutscene(MS.day);
+          }
+        }, 1500);
+      }
+
+      /* ── Next Day / Manual Advance Fallback ──────────────────── */
+      function moaNextDay() {
+        if (!MS || MS.done || _isChoiceAnimating) return;
+        const resultEl = $q('#moa-choice-result');
+        if (resultEl) {
+          resultEl.hidden = true;
+          resultEl.innerHTML = '';
+        }
+
+        if (MS.currentShift === 0) {
+          MS.currentShift = 1;
+          MS.chosen = false;
+          MS.pendingChoice = null;
+          moaRenderDay();
+        } else if (MS.currentShift === 1) {
+          MS.currentShift = 2;
+          MS.chosen = false;
+          MS.pendingChoice = null;
+          moaRenderDay();
+        } else {
+          if (MS.day >= 10) {
+            MS.done = true;
+            moaFinish(true);
+            return;
+          }
+          MS.day++;
+          MS.currentShift = 0;
+          MS.chosen = false;
+          MS.pendingChoice = null;
+          moaRenderDay();
+          moaShowCutscene(MS.day);
+        }
+      }
+
+      /* ── Granny-Style Atmospheric Cutscenes ─────────────────── */
+      const MOA_CUTSCENES = {
+        1: "“The silence outside the dome is deafening...”",
+        2: "“Something heavy is shifting in the upper atmosphere...”",
+        3: "“The radar screen is flashing red.”",
+        4: "“Water is life. Every drop counts.”",
+        5: "“The greenhouse lights hum in the dark.”",
+        6: "“X-ray waves are hammering the roof.”",
+        7: "“Red dust swallows the horizon.”",
+        8: "“Muscles weaken as the days blur together.”",
+        9: "“A direct hit is inbound.”",
+        10: "“The final descent begins now.”"
+      };
+
+      function moaShowCutscene(dayNum) {
+        const cutsceneEl = $q('#moa-day-cutscene');
+        const solEl = $q('#moa-cutscene-sol');
+        const subEl = $q('#moa-cutscene-sub');
+        if (!cutsceneEl) return;
+        if (solEl) solEl.textContent = `DAY ${dayNum}`;
+        if (subEl) subEl.textContent = MOA_CUTSCENES[dayNum] || '“Prepare for the day ahead...”';
+        cutsceneEl.hidden = false;
+      }
+
+      /* ── Mission Control Modal Logic ─────────────────────────── */
+      function moaOpenMissionControl() {
+        const modal = $q('#moa-mc-modal');
+        const recapEl = $q('#moa-mc-recap');
+        const badgeEl = $q('#moa-mc-badge');
+        const gridEl = $q('#moa-mc-meters-grid');
+        if (!modal) return;
+
+        const currentDay = MS ? MS.day : 1;
+        const currentShift = MS ? MS.currentShift : 0;
+        const dayIdx = clamp(currentDay - 1, 0, MOA_DAYS.length - 1);
+        const shiftIdx = clamp(currentShift, 0, 2);
+        const dayInfo = MOA_DAYS[dayIdx];
+        const shiftInfo = MOA_SHIFTS[shiftIdx];
+
+        if (badgeEl) badgeEl.textContent = `Day ${currentDay} • ${shiftInfo.label}`;
+
+        if (recapEl) {
+          recapEl.innerHTML = `
+            <div style="font-weight:800;font-size:1.05rem;color:#3b2c2a;margin-bottom:4px">
+              🛰️ Day ${currentDay}: ${escH(dayInfo.title)} (${escH(shiftInfo.label)})
+            </div>
+            <div style="font-size:0.9rem;font-weight:700;color:#c8600a;margin-bottom:6px">
+              ${escH(dayInfo.kp)}
+            </div>
+            <p style="margin:0;font-size:0.88rem;line-height:1.45;opacity:0.88">
+              <b>Space Science Tip:</b> ${escH(dayInfo.tip)}
+            </p>
+          `;
+        }
+
+        if (gridEl) {
+          gridEl.innerHTML = MOA_METERS.map((m) => {
+            const val = (MS && MS.v && MS.v[m.key] !== undefined) ? MS.v[m.key] : 100;
+            const pct = clamp(val, 0, 100);
+            const isLow = pct < 30;
+            const isCrit = pct <= 0;
+            const statusLabel = isCrit ? 'OFFLINE' : (isLow ? 'CRITICAL' : 'NOMINAL');
+            return `
+              <div class="card" style="padding:10px;text-align:center;background:${isLow ? '#ffd9d0' : '#fff'}">
+                <div style="font-size:1.5rem">${m.icon}</div>
+                <b style="font-size:0.95rem">${m.label}</b>
+                <div style="font-size:1.25rem;font-weight:800;color:${isLow ? '#c8600a' : m.darkColor}">${pct}%</div>
+                <span class="badge" style="position:static;font-size:0.7rem;background:${isLow ? '#f28b6e' : '#c3e6cc'};color:#3b2c2a">
+                  ${statusLabel}
+                </span>
+              </div>
+            `;
+          }).join('');
+        }
+
+        modal.hidden = false;
+      }
+
+      function moaCloseMissionControl() {
+        const modal = $q('#moa-mc-modal');
+        if (modal) modal.hidden = true;
+      }
+
+      /* ── Victory / Failure screen ────────────────────────────── */
+      function moaFinish(win, reason) {
+        moaClearAllTimers();
+        const choiceEl = $q('#moa-choice-overlay');
+        if (choiceEl) { choiceEl.hidden = true; choiceEl.classList.remove('fade-out'); }
+
+        const v = (MS && MS.v) ? MS.v : { power: 100, o2: 100, shields: 100, health: 100 };
+        const avg = (v.power + v.o2 + v.shields + v.health) / 4;
+        const box = $q('#moa-end-box');
+        if (!box) return;
+
+        if (win) {
+          box.style.background = 'transparent';
+          box.style.border = 'none';
+          box.style.boxShadow = 'none';
+          box.style.padding = '0';
+          box.innerHTML = `
+        <div class="moa-victory-wrap">
+          <div class="moa-space-scene">
+            <div class="moa-stars-bg"></div>
+            <div class="moa-earth" title="Planet Earth">🌍</div>
+            <div class="moa-rocket" title="Rocket Liftoff">🚀</div>
+            <div class="moa-mars-surface"></div>
+            <div class="moa-mars-label">Outpost Alpha · Mars</div>
+          </div>
+
+          <h1 class="moa-victory-headline">MISSION COMPLETE! RETURNING TO EARTH</h1>
+          <div class="moa-victory-badge">★★★ 3-Star Certified Junior Astronaut ★★★</div>
+
+          <p style="font-size:1.1rem;margin:10px auto 18px;max-width:540px;line-height:1.55;color:#fff3e2">
+            Outstanding leadership, Commander! All four astronauts survived <b>10 Days (30 Mission Shifts)</b> on Mars Outpost Alpha and successfully completed their interplanetary mission.
+          </p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:18px 0;text-align:center">
+            ${MOA_METERS.map((m) => `
+              <div class="card" style="padding:10px;background:#fff;color:var(--ink)">
+                <div style="font-size:1.6rem">${m.icon}</div>
+                <b style="font-size:0.95rem">${m.label}</b>
+                <div style="font-size:1.35rem;font-weight:800;color:${v[m.key] < 30 ? '#c8600a' : '#1a7a40'}">${v[m.key]}%</div>
+              </div>`).join('')}
+          </div>
+
+          <div class="card" style="background:var(--sky);color:var(--ink);text-align:left;margin:16px 0;padding:14px 16px">
+            <b style="font-size:1.05rem">🏆 Mission Debriefing:</b><br>
+            <span style="font-size:.92rem;line-height:1.5;display:block;margin-top:4px">
+              Commander survived 10 days (30 shifts) of real NASA-tracked space weather events with final average system health of <b>${Math.round(avg)}%</b>.
+            </span>
+          </div>
+
+          <button class="btn alt moa-again-btn" style="margin-top:16px;width:100%;font-size:1.25rem;padding:12px 24px">
+            🔄 Play Again
+          </button>
+        </div>`;
+        } else {
+          box.style.background = '';
+          box.style.border = '';
+          box.style.boxShadow = '';
+          box.style.padding = '';
+          box.innerHTML = `
+        <h1 style="font-size:2.2rem">🛰️ Mission Failed</h1>
+        <p style="font-size:1.1rem;margin:10px 0"><b>${escH(reason || 'A critical system failed.')}</b> Mission Control is evacuating the crew.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0;text-align:center">
+          ${MOA_METERS.map((m) => `
+            <div class="card" style="padding:10px;background:${v[m.key] <= 0 ? '#ffd9d0' : 'var(--card)'}">
+              <div style="font-size:1.5rem">${m.icon}</div>
+              <b>${m.label}</b>
+              <div style="font-size:1.3rem;font-weight:800;color:${v[m.key] <= 0 ? '#c8600a' : '#3b2c2a'}">${v[m.key]}%</div>
+            </div>`).join('')}
+        </div>
+        <div class="card" style="background:var(--sky);margin:12px 0;padding:12px 14px">
+          <span style="font-size:.9rem">You reached <b>Day ${MS ? MS.day : 1} of 10 (${MS && MOA_SHIFTS[MS.currentShift] ? MOA_SHIFTS[MS.currentShift].label : '☀️ Morning Shift'})</b>. Every real mission learns from tough days — try a different strategy!</span>
+        </div>
+        <h2 style="margin-top:14px;margin-bottom:8px">What You Learned</h2>
+        <ul style="text-align:left;font-size:.95rem;line-height:1.7">
+          <li>🌞 Real space-weather events like CMEs and solar flares force impossible trade-offs.</li>
+          <li>⚡ Every resource decision has a ripple effect across all outpost systems.</li>
+          <li>🚀 Real astronauts train for years to handle exactly these scenarios!</li>
+        </ul>
+        <p style="font-size:.82rem;opacity:.65;margin-top:12px">🛰️ Grounded in real NASA DONKI &amp; WSA-ENLIL Space Weather Data</p>
+        <button class="btn alt moa-again-btn" style="margin-top:16px;display:block;width:100%">🔄 Try Again</button>`;
+        }
+
+        moaShow('moa-end');
+      }
+
+      /* ── Event listeners ─────────────────────────────────────── */
+
+      // "Initialize Mission" — 2s launch transition then Day 1 Cutscene
+      const initBtn = $q('#moa-init');
+      if (initBtn) {
+        initBtn.addEventListener('click', () => {
+          initBtn.disabled = true;
+          moaLoader(
+            true,
+            'TRAJECTORY LOCKED — PREPARING FOR LANDING',
+            'Life support online. Solar sensors calibrated. Good luck, Commander!',
+            2000,
+            () => {
+              initBtn.disabled = false;
+              MS = moaNewState();
+              moaLog('Mission initialized. Day 1 begins now — choose wisely, Commander!');
+              moaShow('moa-game');
+              moaRenderDay();
+              moaShowCutscene(1);
+            }
+          );
+        });
+      }
+
+      // Pre-Day Cutscene "Continue to Mission" button
+      const cutsceneContinueBtn = $q('#moa-cutscene-continue');
+      if (cutsceneContinueBtn) {
+        cutsceneContinueBtn.addEventListener('click', () => {
+          const cutsceneEl = $q('#moa-day-cutscene');
+          if (cutsceneEl) cutsceneEl.hidden = true;
+          moaShow('moa-game');
+          moaRenderDay();
+        });
+      }
+
+      // "Mission Control" button click handlers
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.moa-mc-btn')) {
+          moaOpenMissionControl();
+        }
+      });
+
+      const mcCloseBtn = $q('#moa-mc-close');
+      if (mcCloseBtn) {
+        mcCloseBtn.addEventListener('click', moaCloseMissionControl);
+      }
+
+      const mcModal = $q('#moa-mc-modal');
+      if (mcModal) {
+        mcModal.addEventListener('click', (e) => {
+          if (e.target === mcModal) moaCloseMissionControl();
+        });
+      }
+
+      // "Quit Mission" button & modal handlers
+      const quitBtn = $q('#moa-quit-btn');
+      const quitModal = $q('#moa-quit-modal');
+      const cancelQuitBtn = $q('#moa-cancel-quit');
+      const confirmQuitBtn = $q('#moa-confirm-quit');
+
+      if (quitBtn && quitModal) {
+        quitBtn.addEventListener('click', () => {
+          quitModal.hidden = false;
+        });
+      }
+
+      if (cancelQuitBtn && quitModal) {
+        cancelQuitBtn.addEventListener('click', () => {
+          quitModal.hidden = true;
+        });
+      }
+
+      if (quitModal) {
+        quitModal.addEventListener('click', (e) => {
+          if (e.target === quitModal) quitModal.hidden = true;
+        });
+      }
+
+      if (confirmQuitBtn && quitModal) {
+        confirmQuitBtn.addEventListener('click', () => {
+          quitModal.hidden = true;
+          moaClearAllTimers();
+          const cutsceneEl = $q('#moa-day-cutscene');
+          if (cutsceneEl) cutsceneEl.hidden = true;
+          const choiceEl = $q('#moa-choice-overlay');
+          if (choiceEl) { choiceEl.hidden = true; choiceEl.classList.remove('fade-out'); }
+          const mcModalEl = $q('#moa-mc-modal');
+          if (mcModalEl) mcModalEl.hidden = true;
+          MS = null;
+          _prevView = null;
+          moaShow('moa-briefing');
+        });
+      }
+
+      // "Mission Guide" button on briefing screen
+      const guideBtn = $q('#moa-guide-btn');
+      if (guideBtn) {
+        guideBtn.addEventListener('click', () => {
+          _prevView = 'moa-briefing';
+          moaShow('moa-guide');
+        });
+      }
+
+      // "Mission Guide" button on active game screen
+      const gameGuideBtn = $q('#moa-game-guide-btn');
+      if (gameGuideBtn) {
+        gameGuideBtn.addEventListener('click', () => {
+          _prevView = 'moa-game';
+          moaShow('moa-guide');
+        });
+      }
+
+      // "← Back to Mission Control" on guide page
+      const guideBack = $q('#moa-guide-back');
+      if (guideBack) {
+        guideBack.addEventListener('click', () => {
+          const target = _prevView || 'moa-briefing';
+          moaShow(target);
+          if (target === 'moa-game' && MS) moaRenderDay();
+        });
+      }
+
+      // Escape key closes open modals
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const mcModalEl = $q('#moa-mc-modal');
+          if (mcModalEl && !mcModalEl.hidden) {
+            moaCloseMissionControl();
+            return;
+          }
+          const quitModalEl = $q('#moa-quit-modal');
+          if (quitModalEl && !quitModalEl.hidden) {
+            quitModalEl.hidden = true;
+            return;
+          }
+        }
+      });
+
+      // Game screen: Select action (A/B/C/D) & Confirm action
+      const gameScreen = $q('#moa-game');
+      if (gameScreen) {
+        gameScreen.addEventListener('click', (e) => {
+          if (!MS || MS.done || _isChoiceAnimating) return;
+
+          // Action option button clicked (A, B, C, or D) -> highlight/select
+          const btn = e.target.closest('[data-moa-btn]');
+          if (btn && !btn.disabled) {
+            const label = btn.dataset.moaBtn;
+            if (['A', 'B', 'C', 'D'].includes(label)) moaSelectOption(label);
+            return;
+          }
+
+          // Confirm button clicked -> execute choice
+          const confirmEl = e.target.closest('[data-moa-confirm]');
+          if (confirmEl && !confirmEl.disabled) {
+            const pending = MS && MS.pendingChoice;
+            if (['A', 'B', 'C', 'D'].includes(pending)) moaChoose(pending);
+            return;
+          }
+
+          // Legacy Next Day fallback
+          const nextEl = e.target.closest('#moa-next');
+          if (nextEl && !nextEl.disabled) moaNextDay();
+        });
+      }
+
+      // End screen: Play Again / Try Again
+      const endScreen = $q('#moa-end');
+      if (endScreen) {
+        endScreen.addEventListener('click', (e) => {
+          if (e.target.closest('.moa-again-btn')) {
+            moaClearAllTimers();
+            const cutsceneEl = $q('#moa-day-cutscene');
+            if (cutsceneEl) cutsceneEl.hidden = true;
+            const choiceEl = $q('#moa-choice-overlay');
+            if (choiceEl) { choiceEl.hidden = true; choiceEl.classList.remove('fade-out'); }
+            MS = null;
+            _prevView = null;
+            moaShow('moa-briefing');
+          }
+        });
+      }
+
+      /* ── Entry point ─────────────────────────────────────────── */
+      (function autoStart() {
+        // Hide original game's screens so only MOA is visible
+        ['lobby', 'game', 'end'].forEach((id) => {
+          const el = $q('#' + id);
+          if (el) el.hidden = true;
+        });
+
+        // Show initial app-open loading screen (2.5 s), then reveal briefing
+        moaLoader(
+          true,
+          'ESTABLISHING UPLINK WITH MARS OUTPOST ALPHA…',
+          '',  // no sub-text on initial load
+          2500,
+          () => {
+            moaShow('moa-briefing');
+          }
+        );
+      })();
+
+      // Expose global launcher
+      window.launchMarsOutpostAlpha = function () {
+        if (_loaderTimer !== null) { clearTimeout(_loaderTimer); _loaderTimer = null; }
+        if (_choiceTimer !== null) { clearTimeout(_choiceTimer); _choiceTimer = null; }
+        if (_choiceFadeTimer !== null) { clearTimeout(_choiceFadeTimer); _choiceFadeTimer = null; }
+        _isChoiceAnimating = false;
+        const overlay = $q('#moa-loader');
+        if (overlay) { overlay.hidden = true; overlay.classList.remove('fade-out'); }
+        const choiceEl = $q('#moa-choice-overlay');
+        if (choiceEl) { choiceEl.hidden = true; choiceEl.classList.remove('fade-out'); }
+        const cutsceneEl = $q('#moa-day-cutscene');
+        if (cutsceneEl) cutsceneEl.hidden = true;
+        const mcModalEl = $q('#moa-mc-modal');
+        if (mcModalEl) mcModalEl.hidden = true;
+        const quitModalEl = $q('#moa-quit-modal');
+        if (quitModalEl) quitModalEl.hidden = true;
+        MS = null;
+        _prevView = null;
+        ['lobby', 'game', 'end'].forEach((id) => {
+          const el = $q('#' + id);
+          if (el) el.hidden = true;
+        });
+        moaShow('moa-briefing');
+      };
+
+    })(); // end IIFE
+  </script>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]] } return a };
+
+    const MET = [
+      { k: "o2", n: "Oxygen", i: "💨", c: "#8fd3f0", max: 100, w: 1 },
+      { k: "energy", n: "Energy", i: "⚡", c: "#ffd75e", max: 100, w: 1 },
+      { k: "water", n: "Water", i: "💧", c: "#86b9f5", max: 100, w: 1 },
+      { k: "food", n: "Food", i: "🥕", c: "#a8da8f", max: 100, w: 1 },
+      { k: "shield", n: "Suit Shield", i: "🛡️", c: "#f7a98f", max: 100, w: 1 },
+      { k: "morale", n: "Morale", i: "😊", c: "#ffb7cb", max: 100, w: 1 },
+      { k: "science", n: "Science", i: "🔬", c: "#8fddd0", max: 60, w: 0 },
+      { k: "parts", n: "Bricks & Parts", i: "🧱", c: "#e3b48f", max: 30, w: 1 }
+    ];
+    const MX = Object.fromEntries(MET.map(m => [m.k, m.max]));
+    const IC = Object.fromEntries(MET.map(m => [m.k, m.i]));
+    const fmt = o => Object.entries(o).filter(([, n]) => n).map(([k, n]) => `<span class="fx ${n > 0 ? "up" : "dn"}">${IC[k]} ${n > 0 ? "+" : "−"}${Math.abs(n)}</span>`).join("");
+    const neg = o => Object.fromEntries(Object.entries(o).map(([k, n]) => [k, -n]));
+
+    const MISSIONS = [
+      { n: "Landing Site Alpha", e: "🏜️", d: "A flat, sunny plain. Great for learning the ropes.", sun: 0, water: 0 },
+      { n: "Dust Season", e: "🌪️", d: "Storms roll in a lot. Solar panels get dusty.", sun: -3, water: 0 },
+      { n: "Ice Cave Outpost", e: "🧊", d: "Plenty of ice for water, but not much sunshine.", sun: -4, water: 25 }
+    ];
+    const DIFFS = [
+      { n: "Cadet", f: .7, days: 12, ap: 3, ev: .5, t: "Gentle start: slower drain, 3 jobs per Sol, 12 Sols." },
+      { n: "Commander", f: 1, days: 18, ap: 2, ev: .7, t: "The real deal: 2 jobs per Sol, 18 Sols." },
+      { n: "Hardcore", f: 1.35, days: 24, ap: 2, ev: .9, t: "Fast drain and lots of dilemmas. 24 Sols!" }
+    ];
+    const ROLES = [
+      { n: "🔧 Engineer", d: "Starts with extra bricks & parts", b: { parts: 6 } },
+      { n: "🌱 Botanist", d: "Starts with a fuller pantry", b: { food: 12 } },
+      { n: "🩺 Medic", d: "Crew starts in a better mood", b: { morale: 12 } }
+    ];
+    const AVS = ["👩‍🚀", "🧑‍🚀", "👨‍🚀"];
+    const SUITS = ["#ffd2a6", "#c3e6cc", "#bfe0f2", "#ffe8a3"];
+
+    const ACTIONS = [
+      { id: "moxie", i: "🌬️", n: "Run MOXIE", d: "Makes oxygen from Martian air, like on Perseverance!", cost: () => ({ energy: 8 }), gain: () => ({ o2: 14 }) },
+      { id: "green", i: "🌱", n: "Tend greenhouse", d: "Water the crops and pick veggies.", cost: () => ({ energy: 6, water: 5 }), gain: () => ({ food: 14 + (S.up.garden ? 6 : 0), morale: 2 }) },
+      { id: "rover", i: "🚙", n: "Rover expedition", d: "Collect rocks and bricks. Dust scratches suits!", cost: () => ({ energy: 8, shield: S.up.suits ? 5 : 10 }), gain: () => ({ science: 8, parts: 3 }) },
+      { id: "recycle", i: "♻️", n: "Recycle water", d: "Clean used water so it can be drunk again.", cost: () => ({ energy: 6, parts: 1 }), gain: () => ({ water: 12 + (S.up.recycler ? 6 : 0) }) },
+      { id: "repair", i: "🔧", n: "Patch suits & walls", d: "Use bricks to fix scratches and leaks.", cost: () => ({ parts: 3 }), gain: () => ({ shield: 14 }) },
+      { id: "movie", i: "🎬", n: "Movie night", d: "Popcorn-flavored paste and a film from Earth.", cost: () => ({ energy: 3 }), gain: () => ({ morale: 10 }) }
+    ];
+    const UPS = [
+      { id: "solar", i: "☀️", n: "Bigger solar wings", c: 12, d: "+5 energy every Sol" },
+      { id: "recycler", i: "🚿", n: "Water recycler Mk2", c: 15, d: "Recycling gives +6 water; daily use −1" },
+      { id: "suits", i: "🧤", n: "Dust-proof suits", c: 15, d: "Rover trips cost 5 shield instead of 10" },
+      { id: "garden", i: "🥬", n: "Mars garden lamps", d: "Greenhouse gives +6 extra food", c: 18 }
+    ];
+
+    const DIL = [
+      {
+        t: "The garden is thirsty", d: "The water tank is almost empty. The basil plants are drooping, and the crew is gloomy.", f: "The space station recycles over 90% of its water, even sweat and breath moisture!",
+        c: [{ l: "🌿 Water the plants", d: "Save the crops.", fx: { water: -10, food: 12 }, r: "The plants perked up and the crew got fresh salad." },
+        { l: "🍵 Brew warm tea", d: "A cozy cup for everyone.", fx: { water: -10, morale: 14, food: -3 }, r: "Tea time! Smiles all around, but a few plants wilted." }]
+      },
+      {
+        t: "Dust storm incoming!", d: "A huge red cloud is rolling in. You only have enough power for one big job.", f: "Martian dust storms can cover the whole planet, but the air is so thin the wind can’t knock things over.", storm: 2,
+        c: [{ l: "🛡️ Power the radiation shields", d: "Keep the suits and walls safe.", fx: { energy: -18 }, r: "The shields hummed and the storm passed without scratches." },
+        { l: "🔬 Power the science lab", d: "Finish the research before the storm.", fx: { energy: -18, science: 12, shield: -20 }, r: "Great data! But dust scraped the unprotected suits." }]
+      },
+      {
+        t: "Hiss! A leaky airlock", d: "The outer door isn’t sealing. Air is sneaking out.", f: "Every time astronauts go outside, a little air escapes from the airlock.",
+        c: [{ l: "🧱 Patch it with bricks", d: "Fix it properly.", fx: { parts: -4, o2: -2 }, r: "Sealed tight with regolith bricks." },
+        { l: "⏩ Ignore it for now", d: "Save your parts.", fx: { o2: -15, morale: -3 }, r: "The leak kept hissing. Nobody slept well." }]
+      },
+      {
+        t: "Dusty solar panels", d: "A layer of red dust is blocking the sunlight.", f: "In 2004, wind gusts cleaned the panels of the Opportunity rover, which kept it going for years!",
+        c: [{ l: "🧹 Send a brush crew", d: "A spacewalk to clean them.", fx: { shield: -10, energy: 12 }, r: "Sparkling clean panels, and tired arms." },
+        { l: "🌬️ Wait for the wind", d: "Maybe a breeze will help.", fx: { energy: -6, morale: 3 }, r: "The crew played cards while waiting. No breeze came." }]
+      },
+      {
+        t: "Birthday on Mars!", d: "Mei turns 30 today. A Mars day (a sol) lasts 24 hours and 37 minutes, so it’s a long party.", f: "A Martian year is 687 Earth days, so your birthday comes about half as often.",
+        c: [{ l: "🎂 Bake a space cake", d: "Uses food and water.", fx: { food: -10, water: -4, morale: 16 }, r: "Everyone sang. Best day in weeks!" },
+        { l: "📦 Save the supplies", d: "Sensible, but a bit sad.", fx: { morale: -6 }, r: "Mei understood, but the habitat felt quiet." }]
+      },
+      {
+        t: "Rover stuck in sand", d: "Rover 2 sank into a soft dune, far from base.", f: "NASA’s Spirit rover got stuck in soft sand in 2009 and could never drive out.",
+        c: [{ l: "🪢 Rescue mission", d: "Risky, but worth it.", fx: { energy: -10, shield: -10, science: 3 }, r: "You freed it and saved the samples!" },
+        { l: "👋 Leave it behind", d: "Not worth the risk.", fx: { science: -6, morale: -4 }, r: "Goodbye, little rover. The crew was sad." }]
+      },
+      {
+        t: "Surprise ice find!", d: "The drill hit a layer of buried ice!", f: "Mars has ice at its poles and hidden underground. Future settlers could use it for water and fuel.",
+        c: [{ l: "💧 Melt it for water", d: "Fill the tanks.", fx: { energy: -8, water: 20 }, r: "The tanks are filling up. Phew!" },
+        { l: "🔬 Study the ice", d: "Could hold clues about the past.", fx: { energy: -4, science: 12 }, r: "The ice has layers like tree rings. Amazing!" }]
+      },
+      {
+        t: "Call from Earth", d: "Mission Control is on the radio. It’s a long delay, so the call is expensive in power.", f: "A radio message takes between 3 and 22 minutes to travel one way between Earth and Mars.",
+        c: [{ l: "👨‍👩‍👧 Family video call", d: "Hear from loved ones.", fx: { energy: -6, morale: 14 }, r: "There were tears, laughs and lots of waving." },
+        { l: "📊 Send science reports", d: "Keep the research flowing.", fx: { science: 6, morale: -5 }, r: "Earth loved the data. The crew felt a little lonely." }]
+      }
+    ];
+
+    let cfg = { m: 0, d: 1, role: 0, av: 0, suit: 0 }, S = null;
+
+    /* ---------- lobby ---------- */
+    function opt(k, i, on, html, cls) { return `<button class="opt ${cls || ""} ${on ? "on" : ""}" data-k="${k}" data-i="${i}" aria-pressed="${on}">${html}</button>` }
+    function renderLobby() {
+      $("#missions").innerHTML = MISSIONS.map((m, i) => opt("m", i, cfg.m == i, `<b>${m.e} ${m.n}</b><small>${m.d}</small>`)).join("");
+      $("#diffs").innerHTML = DIFFS.map((d, i) => opt("d", i, cfg.d == i, `<b>${d.n}</b>`)).join("");
+      $("#diffTxt").textContent = DIFFS[cfg.d].t;
+      $("#roles").innerHTML = ROLES.map((r, i) => opt("role", i, cfg.role == i, `<b>${r.n}</b><small>${r.d}</small>`)).join("");
+      $("#avs").innerHTML = AVS.map((a, i) => opt("av", i, cfg.av == i, a, "av")).join("");
+      $("#suits").innerHTML = SUITS.map((c, i) => `<button class="sw ${cfg.suit == i ? "on" : ""}" style="background:${c}" data-k="suit" data-i="${i}" aria-label="Suit color ${i + 1}" aria-pressed="${cfg.suit == i}"></button>`).join("");
+    }
+    document.addEventListener("click", e => {
+      const b = e.target.closest("[data-k]");
+      if (b) { cfg[b.dataset.k] = +b.dataset.i; renderLobby() }
+    });
+
+    /* ---------- state helpers ---------- */
+    const add = (k, n) => { S.v[k] = clamp(Math.round(S.v[k] + n), 0, MX[k]) };
+    const addAll = o => Object.entries(o).forEach(([k, n]) => add(k, n));
+    const sun = () => Math.max(2, 18 + MISSIONS[cfg.m].sun + (S.up.solar ? 5 : 0) - (S.storm > 0 ? 9 : 0));
+    const log = t => { S.log.unshift(t); S.log = S.log.slice(0, 6) };
+    const show = id => { ["lobby", "game", "end"].forEach(x => $("#" + x).hidden = x != id); window.scrollTo(0, 0) };
+
+    function launch() {
+      const m = MISSIONS[cfg.m], d = DIFFS[cfg.d];
+      S = {
+        sol: 1, ap: d.ap, up: {}, log: [], storm: 0, done: false, cur: null, pool: shuffle(DIL.map((_, i) => i)),
+        v: { o2: 80, energy: 70, water: 70 + m.water, food: 70, shield: 80, morale: 70, science: 0, parts: 10 }
+      };
+      addAll(ROLES[cfg.role].b);
+      const nm = ($("#name").value.trim() || "Nova");
+      S.name = nm;
+      log(`Welcome to Mars, Commander ${nm}! Mission: ${m.n}.`);
+      show("game"); render();
+    }
+
+    /* ---------- render ---------- */
+    function render() {
+      const d = DIFFS[cfg.d];
+      $("#solTxt").textContent = `Sol ${Math.min(S.sol, d.days)} of ${d.days}`;
+      $("#solFill").style.width = ((S.sol - 1) / d.days * 100) + "%";
+      $("#sun").textContent = `☀️ Solar today +${sun()}  ·  Life support −${Math.round(8 * d.f)}` + (S.storm > 0 ? "  ·  🌪️ Dust storm!" : "");
+      $("#pips").innerHTML = Array.from({ length: d.ap }, (_, i) => `<span class="${i >= S.ap ? "used" : ""}"></span>`).join("");
+      const low = [];
+      $("#hud").innerHTML = MET.map(m => {
+        const v = S.v[m.k], p = v / m.max * 100, l = m.w && p < 25;
+        if (l) low.push(m.n);
+        return `<div class="tile ${l ? "low" : ""}"><div class="hd"><span>${m.i} ${m.n}</span><b>${v}</b></div><div class="bar"><i style="width:${p}%;background:${m.c}"></i></div>${l ? '<span class="badge">LOW!</span>' : ""}</div>`;
+      }).join("");
+      const w = $("#warn"); w.hidden = !low.length;
+      if (low.length) w.textContent = "⚠️ Running low: " + low.join(", ") + ". Fix it before it hits zero!";
+      $("#acts").innerHTML = ACTIONS.map(a => {
+        const c = a.cost(), g = a.gain();
+        const ok = S.ap > 0 && Object.entries(c).every(([k, n]) => S.v[k] >= n);
+        return `<button class="act" data-a="${a.id}" ${ok ? "" : "disabled"}><span class="ai">${a.i}</span><span><b>${a.n}</b><small>${a.d}</small>${fmt(neg(c))}${fmt(g)}</span></button>`;
+      }).join("");
+      $("#ups").innerHTML = UPS.map(u => {
+        const own = S.up[u.id], ok = !own && S.v.science >= u.c;
+        return `<button class="act" data-u="${u.id}" ${ok ? "" : "disabled"}><span class="ai">${u.i}</span><span><b>${u.n}</b>${own ? " ✅" : ""}<small>${u.d}</small><span class="fx dn">🔬 ${u.c}</span></span></button>`;
+      }).join("");
+      const faces = S.v.morale > 70 ? "😄" : S.v.morale > 40 ? "🙂" : S.v.morale > 20 ? "😟" : "😢";
+      $("#crew").innerHTML = [S.name, "Ravi", "Mei", "Tomás"].map((n, i) => `<div><span style="background:${i ? "#fff" : SUITS[cfg.suit]};border:3px solid var(--ink);border-radius:50%;width:54px;height:54px;line-height:48px;margin:0 auto 2px">${faces}</span>${esc(n)}</div>`).join("");
+      $("#log").innerHTML = S.log.map(t => `<li>${esc(t)}</li>`).join("");
+      $("#endSol").disabled = S.done || !!S.cur;
+    }
+
+    /* ---------- actions ---------- */
+    document.addEventListener("click", e => {
+      if (!S || S.done || S.cur) return;
+      const a = e.target.closest("[data-a]"), u = e.target.closest("[data-u]");
+      if (a) {
+        const x = ACTIONS.find(z => z.id == a.dataset.a), c = x.cost();
+        if (S.ap < 1 || !Object.entries(c).every(([k, n]) => S.v[k] >= n)) return;
+        addAll(neg(c)); addAll(x.gain()); S.ap--;
+        log(`${x.i} ${x.n}: done!`); render();
+      }
+      if (u) {
+        const x = UPS.find(z => z.id == u.dataset.u);
+        if (S.up[x.id] || S.v.science < x.c) return;
+        add("science", -x.c); S.up[x.id] = 1; log(`${x.i} Unlocked: ${x.n}!`); render();
+      }
+    });
+
+    function endSol() {
+      const d = DIFFS[cfg.d], f = d.f, gain = sun();
+      add("energy", gain - Math.round(8 * f));
+      add("o2", -Math.round(5 * f));
+      add("water", -Math.max(1, Math.round(3 * f) - (S.up.recycler ? 1 : 0)));
+      add("food", -Math.round(4 * f));
+      add("shield", -1);
+      const lows = ["o2", "water", "food", "energy"].filter(k => S.v[k] < 25).length;
+      add("morale", -2 - lows);
+      let note = `Sol ${S.sol} done. Solar gave +${gain} energy.`;
+      if (S.v.energy <= 0) { add("o2", -8); note += " Power is out! Life support is failing." }
+      if (S.storm > 0) S.storm--;
+      log(note);
+      S.sol++; S.ap = d.ap;
+      if (check()) return;
+      if (S.sol > d.days) return finish(true);
+      render();
+      if (Math.random() < d.ev) openDilemma();
+    }
+    $("#endSol").addEventListener("click", () => { if (S && !S.done && !S.cur) endSol() });
+
+    /* ---------- dilemmas ---------- */
+    function openDilemma() {
+      if (!S.pool.length) S.pool = shuffle(DIL.map((_, i) => i));
+      const q = DIL[S.pool.pop()]; S.cur = q;
+      $("#dilBox").innerHTML = `<span class="tag">⚠️ Sol ${S.sol} dilemma</span><h2>${q.t}</h2><p>${q.d}</p><p class="hint">You can only pick one. Real astronauts face trade-offs like this every day.</p>` +
+        q.c.map((c, i) => `<button class="opt" data-c="${i}"><b>${c.l}</b><small>${c.d}</small>${fmt(c.fx)}</button>`).join("");
+      $("#veil").hidden = false; render();
+      const b = $("#dilBox .opt"); if (b) b.focus();
+    }
+    $("#dilBox").addEventListener("click", e => {
+      const b = e.target.closest("[data-c]");
+      if (b && S.cur) {
+        const q = S.cur, c = q.c[+b.dataset.c];
+        addAll(c.fx); if (q.storm) S.storm = q.storm;
+        log(`${q.t}: ${c.l.replace(/^\S+\s/, "")}`);
+        $("#dilBox").innerHTML = `<span class="tag">Result</span><h2>${c.r}</h2><div>${fmt(c.fx)}</div><p class="fact">🔭 <b>Real science:</b> ${q.f}</p><button class="btn" id="cont">Continue</button>`;
+        $("#cont").focus(); render();
+      }
+      if (e.target.id == "cont") {
+        $("#veil").hidden = true; S.cur = null;
+        if (!check()) render();
+      }
+    });
+
+    /* ---------- win / lose ---------- */
+    function check() {
+      const v = S.v;
+      if (v.o2 <= 0) return finish(false, "The oxygen ran out.");
+      if (v.water <= 0) return finish(false, "The water tanks went dry.");
+      if (v.food <= 0) return finish(false, "The crew ran out of food.");
+      if (v.morale <= 0) return finish(false, "The crew was too sad to carry on.");
+      return false;
+    }
+    function finish(win, why) {
+      S.done = true; S.cur = null; $("#veil").hidden = true;
+      const v = S.v, avg = (v.o2 + v.energy + v.water + v.food + v.shield + v.morale) / 6;
+      const st = win ? 1 + (avg > 45) + (avg > 65) : 0;
+      $("#endBox").innerHTML = win
+        ? `<h1>🎉 Mission complete!</h1><div class="stars">${"⭐".repeat(st)}${"☆".repeat(3 - st)}</div><p>Commander ${esc(S.name)}, all four astronauts survived ${DIFFS[cfg.d].days} Sols on Mars. You collected ${v.science} science points along the way.</p>`
+        : `<h1>🛰️ Mission paused</h1><p>${why} Mission Control is bringing the crew home early.</p><p class="hint">Every real mission learns from tough days. Try a different plan!</p>`;
+      $("#endBox").innerHTML += `<h2 style="margin-top:12px">What you practised</h2><ul><li>Real crews can’t resupply fast, so they save and recycle everything.</li><li>Energy powers air, water and food, so one shortage can cause another.</li><li>Happy astronauts work better. Morale is a real mission resource.</li></ul><button class="btn alt" id="again">Back to lobby</button>`;
+      show("end"); return true;
+    }
+    document.addEventListener("click", e => { if (e.target.id == "again") { S = null; show("lobby"); renderLobby() } });
+    $("#launch").addEventListener("click", launch);
+    renderLobby();
+  </script>
+</body>
+
+</html>
